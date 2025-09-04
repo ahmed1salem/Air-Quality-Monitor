@@ -8,12 +8,18 @@
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Google Fonts for better language support (Fix for character display issue) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+
     <!-- LeafletJS for maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Custom Styles -->
     <style>
+        body { font-family: 'Noto Sans', sans-serif; } /* Apply the new font */
         #map { height: 100vh; }
         .loader {
             border: 5px solid #f3f3f3;
@@ -76,7 +82,7 @@
                     <p id="forecast-text" class="text-xs text-gray-700">Analyzing data...</p>
                 </div>
                  <div class="mt-4 text-center text-xs text-gray-500">
-                    <p>Powered by ground-station and weather data. To be enhanced with <span class="font-bold">NASA TEMPO</span> data.</p>
+                    <p>Powered by the nearest ground-station and weather data.</p>
                 </div>
             </div>
         </div>
@@ -101,8 +107,29 @@
         const forecastTextEl = document.getElementById('forecast-text');
         const notifyBtn = document.getElementById('notify-btn');
 
-        // To store the latest data for notifications
         let latestAqiData = null;
+
+        /**
+         * A wrapper for fetch that adds a timeout to prevent freezing.
+         */
+        function fetchWithTimeout(url, timeout = 10000) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error('Request timed out'));
+                }, timeout);
+
+                fetch(url).then(
+                    response => {
+                        clearTimeout(timer);
+                        resolve(response);
+                    },
+                    err => {
+                        clearTimeout(timer);
+                        reject(err);
+                    }
+                );
+            });
+        }
 
         // --- Map Setup ---
         const map = L.map('map').setView([40, -95], 4);
@@ -131,25 +158,29 @@
                 handleError("Please enter your API keys in the code first.");
                 return;
             }
-            const [aqiResult, weatherResult] = await Promise.allSettled([
-                fetchAqiData(lat, lng),
-                fetchWeatherData(lat, lng)
-            ]);
-            const aqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
-            const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
-            
-            latestAqiData = aqiData; // Save latest data
+            try {
+                const [aqiResult, weatherResult] = await Promise.allSettled([
+                    fetchAqiData(lat, lng),
+                    fetchWeatherData(lat, lng)
+                ]);
+                const aqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
+                const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
+                
+                latestAqiData = aqiData;
 
-            if (!aqiData && !weatherData) {
-                handleError("Failed to fetch data from sources. Please try again.");
-            } else {
-                updateUIPanel({ aqiData, weatherData });
+                if (!aqiData && !weatherData) {
+                    handleError("Failed to fetch data. The location might be too remote.");
+                } else {
+                    updateUIPanel({ aqiData, weatherData });
+                }
+            } catch (error) {
+                handleError(error);
             }
         }
         
         async function fetchAqiData(lat, lng) {
             const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
-            const response = await fetch(url);
+            const response = await fetchWithTimeout(url); // Using timeout
             if (!response.ok) throw new Error('AQI data request failed');
             const data = await response.json();
             if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
@@ -158,14 +189,19 @@
 
         async function fetchWeatherData(lat, lng) {
             const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
-            const response = await fetch(url);
+            const response = await fetchWithTimeout(url); // Using timeout
             if (!response.ok) throw new Error('Weather data request failed');
             return await response.json();
         }
 
         function updateUIPanel({ aqiData, weatherData }) {
             if (aqiData) {
-                cityNameEl.textContent = aqiData.city.name;
+                // Truncate long city names to prevent display issues
+                let cityName = aqiData.city.name;
+                if (cityName.length > 45) {
+                    cityName = cityName.substring(0, 45) + '...';
+                }
+                cityNameEl.textContent = cityName;
                 updateTimeEl.textContent = `Last updated: ${new Date(aqiData.time.s * 1000).toLocaleTimeString('en-US')}`;
                 aqiValueEl.textContent = aqiData.aqi;
                 const { status, color } = getAqiStatus(aqiData.aqi);
@@ -200,17 +236,21 @@
             loadingDiv.classList.add('hidden');
             cityNameEl.textContent = "An Error Occurred";
             aqiValueEl.textContent = "!";
-            forecastTextEl.textContent = message;
+            
+            let displayMessage = typeof message === 'string' ? message : message.message;
+            if (displayMessage.includes('timed out')) {
+                displayMessage = "Request took too long. Please try a different area.";
+            }
+            forecastTextEl.textContent = displayMessage;
         }
         
-        // --- STAGE 6: Smart Forecast ---
         function generateForecast(aqiData, weatherData) {
             const aqi = aqiData ? aqiData.aqi : null;
             const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null; // in km/h
             const { advice } = getAqiStatus(aqi);
 
             if (!aqi || !windSpeed) {
-                return advice; // Return default advice if data is missing
+                return advice;
             }
 
             let forecast = advice;
@@ -224,13 +264,11 @@
             return forecast;
         }
         
-        // --- STAGE 7: Notifications ---
         function handleNotificationRequest() {
             if (!('Notification' in window)) {
                 alert('This browser does not support desktop notification');
                 return;
             }
-
             Notification.requestPermission().then(permission => {
                 if (permission === 'granted') {
                     notifyBtn.textContent = 'Notifications Active';
@@ -239,8 +277,6 @@
                         body: 'You will now be notified of poor air quality.',
                         icon: 'https://placehold.co/32x32/3498db/ffffff?text=AQ'
                     });
-
-                    // Send an immediate alert if current quality is bad
                     if (latestAqiData && latestAqiData.aqi > 150) {
                          new Notification('High Pollution Alert!', {
                             body: `Current AQI is ${latestAqiData.aqi} in ${latestAqiData.city.name}. It is very unhealthy.`,
