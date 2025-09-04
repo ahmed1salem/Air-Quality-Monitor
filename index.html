@@ -8,7 +8,7 @@
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts for better language support (Fix for character display issue) -->
+    <!-- Google Fonts for better language support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
 
     <!-- Custom Styles -->
     <style>
-        body { font-family: 'Noto Sans', sans-serif; } /* Apply the new font */
+        body { font-family: 'Noto Sans', sans-serif; }
         #map { height: 100vh; }
         .loader {
             border: 5px solid #f3f3f3;
@@ -87,6 +87,21 @@
             </div>
         </div>
     </div>
+    
+    <!-- Custom Notification Modal -->
+    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+            <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
+            <p class="text-sm text-gray-600 my-4">
+                Allow this site to send you notifications when the air quality is poor in <strong id="modal-city-name">this area</strong>.
+            </p>
+            <div class="flex justify-end gap-4">
+                <button id="modal-deny-btn" class="px-4 py-2 rounded text-gray-700 bg-gray-200 hover:bg-gray-300">Deny</button>
+                <button id="modal-allow-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">Allow</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- !! IMPORTANT !! ---
@@ -106,30 +121,26 @@
         const windValueEl = document.getElementById('wind-value');
         const forecastTextEl = document.getElementById('forecast-text');
         const notifyBtn = document.getElementById('notify-btn');
+        
+        // Modal Elements
+        const notificationModal = document.getElementById('notification-modal');
+        const modalCityNameEl = document.getElementById('modal-city-name');
+        const modalAllowBtn = document.getElementById('modal-allow-btn');
+        const modalDenyBtn = document.getElementById('modal-deny-btn');
 
         let latestAqiData = null;
-
-        /**
-         * A wrapper for fetch that adds a timeout to prevent freezing.
-         */
-        function fetchWithTimeout(url, timeout = 10000) {
-            return new Promise((resolve, reject) => {
-                const timer = setTimeout(() => {
-                    reject(new Error('Request timed out'));
-                }, timeout);
-
-                fetch(url).then(
-                    response => {
-                        clearTimeout(timer);
-                        resolve(response);
-                    },
-                    err => {
-                        clearTimeout(timer);
-                        reject(err);
-                    }
-                );
-            });
-        }
+        
+        // --- Initial Setup ---
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('Notification' in window) {
+                console.log('Browser supports notifications.');
+                updateNotificationButtonState(Notification.permission);
+            } else {
+                console.error('Browser does not support notifications.');
+                notifyBtn.disabled = true;
+                notifyBtn.textContent = "Not Supported";
+            }
+        });
 
         // --- Map Setup ---
         const map = L.map('map').setView([40, -95], 4);
@@ -151,13 +162,14 @@
         });
 
         notifyBtn.addEventListener('click', handleNotificationRequest);
+        modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
+        modalAllowBtn.addEventListener('click', () => {
+            notificationModal.classList.add('hidden');
+            requestBrowserPermission();
+        });
 
         // --- Core Functions ---
         async function fetchAllDataForLocation(lat, lng) {
-            if (WAQI_API_KEY === "YOUR_WAQI_API_KEY_HERE" || OPENWEATHER_API_KEY === "YOUR_OPENWEATHER_API_KEY_HERE") {
-                handleError("Please enter your API keys in the code first.");
-                return;
-            }
             try {
                 const [aqiResult, weatherResult] = await Promise.allSettled([
                     fetchAqiData(lat, lng),
@@ -180,7 +192,7 @@
         
         async function fetchAqiData(lat, lng) {
             const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
-            const response = await fetchWithTimeout(url); // Using timeout
+            const response = await fetchWithTimeout(url);
             if (!response.ok) throw new Error('AQI data request failed');
             const data = await response.json();
             if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
@@ -189,27 +201,24 @@
 
         async function fetchWeatherData(lat, lng) {
             const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
-            const response = await fetchWithTimeout(url); // Using timeout
+            const response = await fetchWithTimeout(url);
             if (!response.ok) throw new Error('Weather data request failed');
             return await response.json();
         }
 
         function updateUIPanel({ aqiData, weatherData }) {
+            let cityName = "Unknown Location";
             if (aqiData) {
-                // Truncate long city names to prevent display issues
-                let cityName = aqiData.city.name;
-                if (cityName.length > 45) {
-                    cityName = cityName.substring(0, 45) + '...';
-                }
+                cityName = aqiData.city.name;
+                if (cityName.length > 45) cityName = cityName.substring(0, 45) + '...';
                 cityNameEl.textContent = cityName;
                 updateTimeEl.textContent = `Last updated: ${new Date(aqiData.time.s * 1000).toLocaleTimeString('en-US')}`;
                 aqiValueEl.textContent = aqiData.aqi;
                 const { status, color } = getAqiStatus(aqiData.aqi);
                 aqiStatusEl.textContent = status;
-                aqiStatusEl.className = `px-3 py-1 text-white rounded-full text-sm inline-block`;
                 aqiStatusEl.style.backgroundColor = color;
             } else {
-                cityNameEl.textContent = weatherData ? weatherData.name : "Unknown Location";
+                cityNameEl.textContent = weatherData ? weatherData.name : cityName;
                 aqiValueEl.textContent = "N/A";
                 aqiStatusEl.textContent = "No Data";
                 aqiStatusEl.style.backgroundColor = "#7f8c8d";
@@ -217,15 +226,13 @@
             if (weatherData) {
                 tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
                 humidityValueEl.textContent = `${weatherData.main.humidity}%`;
-                const windSpeedKmh = Math.round(weatherData.wind.speed * 3.6);
-                windValueEl.textContent = `${windSpeedKmh} km/h`;
-            } else {
-                tempValueEl.textContent = "--°C";
-                humidityValueEl.textContent = "--%";
-                windValueEl.textContent = "-- km/h";
-            }
+                windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
+            } else { /* ... */ }
             
             forecastTextEl.textContent = generateForecast(aqiData, weatherData);
+            if('Notification' in window) {
+                updateNotificationButtonState(Notification.permission);
+            }
 
             loadingDiv.classList.add('hidden');
             dataContentDiv.classList.remove('hidden');
@@ -236,66 +243,96 @@
             loadingDiv.classList.add('hidden');
             cityNameEl.textContent = "An Error Occurred";
             aqiValueEl.textContent = "!";
-            
             let displayMessage = typeof message === 'string' ? message : message.message;
-            if (displayMessage.includes('timed out')) {
-                displayMessage = "Request took too long. Please try a different area.";
-            }
+            if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
             forecastTextEl.textContent = displayMessage;
         }
         
         function generateForecast(aqiData, weatherData) {
             const aqi = aqiData ? aqiData.aqi : null;
-            const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null; // in km/h
+            const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
             const { advice } = getAqiStatus(aqi);
-
-            if (!aqi || !windSpeed) {
-                return advice;
-            }
-
+            if (!aqi || !windSpeed) return advice;
             let forecast = advice;
-            if (aqi > 100 && windSpeed < 5) {
-                forecast += " Light winds may cause pollutants to linger.";
-            } else if (aqi > 100 && windSpeed > 15) {
-                forecast += " Strong winds may help to clear the air soon.";
-            } else if (aqi < 100 && windSpeed > 15) {
-                forecast += " Air quality is expected to remain good due to steady winds.";
-            }
+            if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
+            else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
+            else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
             return forecast;
         }
         
+        // --- Enhanced Notification Logic ---
         function handleNotificationRequest() {
-            if (!('Notification' in window)) {
-                alert('This browser does not support desktop notification');
+            if (!('Notification' in window)) return;
+            console.log("Notification button clicked. Current permission state:", Notification.permission);
+            
+            if (Notification.permission === 'denied') {
+                alert("You have previously blocked notifications. Please enable them in your browser's site settings.");
                 return;
             }
+
+            modalCityNameEl.textContent = latestAqiData?.city?.name || 'this area';
+            notificationModal.classList.remove('hidden');
+        }
+
+        function requestBrowserPermission() {
+            console.log("Requesting browser permission now...");
             Notification.requestPermission().then(permission => {
+                console.log(`Browser permission result: ${permission}`);
+                updateNotificationButtonState(permission);
                 if (permission === 'granted') {
-                    notifyBtn.textContent = 'Notifications Active';
-                    notifyBtn.disabled = true;
-                    new Notification('Air Quality Alerts', {
-                        body: 'You will now be notified of poor air quality.',
+                    const cityName = latestAqiData?.city?.name || 'your area';
+                    new Notification('Air Quality Alerts Enabled!', {
+                        body: `You will now receive alerts for ${cityName}.`,
                         icon: 'https://placehold.co/32x32/3498db/ffffff?text=AQ'
                     });
                     if (latestAqiData && latestAqiData.aqi > 150) {
-                         new Notification('High Pollution Alert!', {
-                            body: `Current AQI is ${latestAqiData.aqi} in ${latestAqiData.city.name}. It is very unhealthy.`,
+                        new Notification(`High Pollution Alert for ${cityName}!`, {
+                            body: `Current AQI is ${latestAqiData.aqi}. This is very unhealthy.`,
                             icon: 'https://placehold.co/32x32/ef4444/ffffff?text=!'
                         });
                     }
                 }
             });
         }
+        
+        function updateNotificationButtonState(permission) {
+            notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500');
+            if (permission === 'granted') {
+                notifyBtn.textContent = 'Notifications Active';
+                notifyBtn.disabled = true;
+                notifyBtn.classList.add('bg-green-500');
+            } else if (permission === 'denied') {
+                notifyBtn.textContent = 'Notifications Blocked';
+                notifyBtn.disabled = true;
+                notifyBtn.classList.add('bg-red-500');
+            } else {
+                notifyBtn.textContent = 'Enable Notifications';
+                notifyBtn.disabled = false;
+                notifyBtn.classList.add('bg-blue-500');
+            }
+        }
 
         function getAqiStatus(aqi) {
-            if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. It's a great day to be active outside!" };
-            if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may experience some symptoms." };
-            if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce prolonged or heavy exertion outdoors." };
-            if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce prolonged or heavy exertion outdoors." };
+            if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
+            if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
+            if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
+            if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
             if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
             return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
         }
 
+        function fetchWithTimeout(url, timeout = 10000) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+                fetch(url).then(response => {
+                    clearTimeout(timer);
+                    resolve(response);
+                }, err => {
+                    clearTimeout(timer);
+                    reject(err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
