@@ -104,32 +104,32 @@
 
 
     <script>
-        // --- !! IMPORTANT !! ---
-        const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
-        const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
-
-        // --- UI Elements & State ---
-        const dataPanel = document.getElementById('data-panel');
-        const loadingDiv = document.getElementById('loading');
-        const dataContentDiv = document.getElementById('data-content');
-        const cityNameEl = document.getElementById('city-name');
-        const updateTimeEl = document.getElementById('update-time');
-        const aqiValueEl = document.getElementById('aqi-value');
-        const aqiStatusEl = document.getElementById('aqi-status');
-        const tempValueEl = document.getElementById('temp-value');
-        const humidityValueEl = document.getElementById('humidity-value');
-        const windValueEl = document.getElementById('wind-value');
-        const forecastTextEl = document.getElementById('forecast-text');
-        const notifyBtn = document.getElementById('notify-btn');
-        const notificationModal = document.getElementById('notification-modal');
-        const modalAllowBtn = document.getElementById('modal-allow-btn');
-        const modalDenyBtn = document.getElementById('modal-deny-btn');
-
-        let latestAqiData = null;
-        let subscribedCities = [];
-
-        // --- Initial Setup ---
         document.addEventListener('DOMContentLoaded', () => {
+            // --- !! IMPORTANT !! ---
+            const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
+            const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
+
+            // --- UI Elements & State ---
+            const dataPanel = document.getElementById('data-panel');
+            const loadingDiv = document.getElementById('loading');
+            const dataContentDiv = document.getElementById('data-content');
+            const cityNameEl = document.getElementById('city-name');
+            const updateTimeEl = document.getElementById('update-time');
+            const aqiValueEl = document.getElementById('aqi-value');
+            const aqiStatusEl = document.getElementById('aqi-status');
+            const tempValueEl = document.getElementById('temp-value');
+            const humidityValueEl = document.getElementById('humidity-value');
+            const windValueEl = document.getElementById('wind-value');
+            const forecastTextEl = document.getElementById('forecast-text');
+            const notifyBtn = document.getElementById('notify-btn');
+            const notificationModal = document.getElementById('notification-modal');
+            const modalAllowBtn = document.getElementById('modal-allow-btn');
+            const modalDenyBtn = document.getElementById('modal-deny-btn');
+
+            let latestAqiData = null;
+            let subscribedCities = [];
+
+            // --- Initial Setup ---
             const savedCities = localStorage.getItem('subscribedCities');
             if (savedCities) {
                 subscribedCities = JSON.parse(savedCities);
@@ -138,225 +138,226 @@
                 notifyBtn.disabled = true;
                 notifyBtn.textContent = "Not Supported";
             }
-        });
 
-        // --- Map Setup ---
-        const map = L.map('map').setView([40, -95], 4);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-        let marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
+            // --- Map Setup ---
+            const map = L.map('map').setView([40, -95], 4);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            let marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
 
-        // --- Event Listeners ---
-        map.on('click', function(e) {
-            const { lat, lng } = e.latlng;
-            marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
-            dataPanel.classList.remove('hidden');
-            loadingDiv.classList.remove('hidden');
-            dataContentDiv.classList.add('hidden');
-            fetchAllDataForLocation(lat, lng); 
-        });
+            // --- Event Listeners ---
+            map.on('click', function(e) {
+                const { lat, lng } = e.latlng;
+                marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
+                dataPanel.classList.remove('hidden');
+                loadingDiv.classList.remove('hidden');
+                dataContentDiv.classList.add('hidden');
+                fetchAllDataForLocation(lat, lng); 
+            });
 
-        notifyBtn.addEventListener('click', handleNotificationClick);
-        modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
-        modalAllowBtn.addEventListener('click', () => {
-            notificationModal.classList.add('hidden');
-            requestBrowserPermission();
-        });
+            notifyBtn.addEventListener('click', handleNotificationClick);
+            modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
+            modalAllowBtn.addEventListener('click', () => {
+                notificationModal.classList.add('hidden');
+                requestBrowserPermission();
+            });
 
-        // --- Core Functions ---
-        async function fetchAllDataForLocation(lat, lng) {
-            try {
-                const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
-                latestAqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
-                const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
-                if (!latestAqiData && !weatherData) {
-                    handleError("Failed to fetch data. The location might be too remote.");
-                } else {
-                    updateUIPanel({ aqiData: latestAqiData, weatherData });
-                }
-            } catch (error) {
-                handleError(error);
-            }
-        }
-        
-        async function fetchAqiData(lat, lng) {
-            const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
-            const response = await fetchWithTimeout(url);
-            if (!response.ok) throw new Error('AQI data request failed');
-            const data = await response.json();
-            if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
-            return data.data;
-        }
-
-        async function fetchWeatherData(lat, lng) {
-            const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
-            const response = await fetchWithTimeout(url);
-            if (!response.ok) throw new Error('Weather data request failed');
-            return await response.json();
-        }
-
-        function updateUIPanel({ aqiData, weatherData }) {
-            let cityName = "Unknown Location";
-            if (aqiData) {
-                cityName = aqiData.city.name;
-                cityNameEl.textContent = cityName.length > 45 ? cityName.substring(0, 45) + '...' : cityName;
-                
-                if (aqiData.time && aqiData.time.s) {
-                    const date = new Date(aqiData.time.s * 1000); // Correctly convert seconds to milliseconds
-                    if (!isNaN(date.getTime())) {
-                        updateTimeEl.textContent = `Last updated: ${date.toLocaleTimeString('en-US')}`;
+            // --- Core Functions ---
+            async function fetchAllDataForLocation(lat, lng) {
+                try {
+                    const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
+                    latestAqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
+                    const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
+                    if (!latestAqiData && !weatherData) {
+                        handleError("Failed to fetch data. The location might be too remote.");
                     } else {
-                        updateTimeEl.textContent = 'Last updated: Invalid Time';
+                        updateUIPanel({ aqiData: latestAqiData, weatherData });
+                    }
+                } catch (error) {
+                    handleError(error);
+                }
+            }
+            
+            async function fetchAqiData(lat, lng) {
+                const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
+                const response = await fetchWithTimeout(url);
+                if (!response.ok) throw new Error('AQI data request failed');
+                const data = await response.json();
+                if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
+                return data.data;
+            }
+
+            async function fetchWeatherData(lat, lng) {
+                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
+                const response = await fetchWithTimeout(url);
+                if (!response.ok) throw new Error('Weather data request failed');
+                return await response.json();
+            }
+
+            function updateUIPanel({ aqiData, weatherData }) {
+                let cityName = "Unknown Location";
+                if (aqiData) {
+                    cityName = aqiData.city.name;
+                    cityNameEl.textContent = cityName.length > 45 ? cityName.substring(0, 45) + '...' : cityName;
+                    
+                    if (aqiData.time && aqiData.time.s) {
+                        const date = new Date(aqiData.time.s);
+                        if (!isNaN(date.getTime())) {
+                            const timeString = date.toLocaleTimeString('en-US');
+                            const timeZoneString = aqiData.time.tz ? `(GMT${aqiData.time.tz})` : '';
+                            updateTimeEl.textContent = `Last updated: ${timeString} ${timeZoneString}`;
+                        } else {
+                            updateTimeEl.textContent = 'Last updated: Invalid Time';
+                        }
+                    } else {
+                        updateTimeEl.textContent = 'Last updated: Not available';
+                    }
+
+                    aqiValueEl.textContent = aqiData.aqi;
+                    const { status, color } = getAqiStatus(aqiData.aqi);
+                    aqiStatusEl.textContent = status;
+                    aqiStatusEl.style.backgroundColor = color;
+                } else {
+                    cityNameEl.textContent = weatherData ? weatherData.name : cityName;
+                    updateTimeEl.textContent = 'Last updated: N/A';
+                    aqiValueEl.textContent = "N/A";
+                    aqiStatusEl.textContent = "No Data";
+                    aqiStatusEl.style.backgroundColor = "#7f8c8d";
+                }
+
+                if (weatherData && weatherData.main) {
+                    tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
+                    humidityValueEl.textContent = `${weatherData.main.humidity}%`;
+                    windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
+                } else {
+                    tempValueEl.textContent = "--°C";
+                    humidityValueEl.textContent = "--%";
+                    windValueEl.textContent = "-- km/h";
+                }
+                
+                forecastTextEl.textContent = generateForecast(aqiData, weatherData);
+                if ('Notification' in window) {
+                    updateNotificationButtonState();
+                }
+
+                loadingDiv.classList.add('hidden');
+                dataContentDiv.classList.remove('hidden');
+            }
+
+            function handleError(message) {
+                const dataContentDiv = document.getElementById('data-content');
+                const loadingDiv = document.getElementById('loading');
+                const cityNameEl = document.getElementById('city-name');
+                const aqiValueEl = document.getElementById('aqi-value');
+                const forecastTextEl = document.getElementById('forecast-text');
+
+                dataContentDiv.classList.remove('hidden');
+                loadingDiv.classList.add('hidden');
+                cityNameEl.textContent = "An Error Occurred";
+                aqiValueEl.textContent = "!";
+                let displayMessage = typeof message === 'string' ? message : message.message;
+                if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
+                forecastTextEl.textContent = displayMessage;
+            }
+            
+            function generateForecast(aqiData, weatherData) {
+                const aqi = aqiData ? aqiData.aqi : null;
+                const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
+                const { advice } = getAqiStatus(aqi);
+                if (!aqi || !windSpeed) return advice;
+                let forecast = advice;
+                if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
+                else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
+                else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
+                return forecast;
+            }
+            
+            function getAqiStatus(aqi) {
+                if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
+                if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
+                if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
+                if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
+                if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
+                return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
+            }
+
+            function fetchWithTimeout(url, timeout = 10000) {
+                return new Promise((resolve, reject) => {
+                    const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+                    fetch(url).then(response => {
+                        clearTimeout(timer);
+                        resolve(response);
+                    }, err => {
+                        clearTimeout(timer);
+                        reject(err);
+                    });
+                });
+            }
+
+            // --- Notification Logic ---
+            function handleNotificationClick() {
+                const permission = Notification.permission;
+                if (permission === "granted") {
+                    toggleCitySubscription();
+                } else if (permission === "denied") {
+                    alert("You have previously blocked notifications. Please enable them in your browser's site settings.");
+                } else {
+                    notificationModal.classList.remove('hidden');
+                }
+            }
+
+            function toggleCitySubscription() {
+                const cityName = latestAqiData?.city?.name;
+                if (!cityName) return;
+
+                const cityIndex = subscribedCities.indexOf(cityName);
+                if (cityIndex > -1) {
+                    subscribedCities.splice(cityIndex, 1);
+                     new Notification(`${cityName} Unsubscribed`, { body: "You will no longer receive alerts for this city.", icon: 'https://placehold.co/32x32/9ca3af/ffffff?text=X' });
+                } else {
+                    subscribedCities.push(cityName);
+                    new Notification(`${cityName} Subscribed!`, { body: "You will now receive air quality alerts for this city.", icon: 'https://placehold.co/32x32/3498db/ffffff?text=AQ' });
+                }
+                
+                localStorage.setItem('subscribedCities', JSON.stringify(subscribedCities));
+                updateNotificationButtonState();
+            }
+
+            function requestBrowserPermission() {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        toggleCitySubscription();
+                    }
+                    updateNotificationButtonState();
+                });
+            }
+            
+            function updateNotificationButtonState() {
+                const permission = Notification.permission;
+                const cityName = latestAqiData?.city?.name;
+
+                notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
+                notifyBtn.disabled = false;
+
+                if (permission === 'denied') {
+                    notifyBtn.textContent = 'Notifications Blocked';
+                    notifyBtn.disabled = true;
+                    notifyBtn.classList.add('bg-red-500');
+                } else if (permission === 'granted') {
+                    if (cityName && subscribedCities.includes(cityName)) {
+                        notifyBtn.textContent = 'Alerts Active';
+                        notifyBtn.classList.add('bg-green-500');
+                    } else {
+                        notifyBtn.textContent = 'Get Alerts for this City';
+                        notifyBtn.classList.add('bg-blue-500');
                     }
                 } else {
-                    updateTimeEl.textContent = 'Last updated: Not available';
-                }
-
-                aqiValueEl.textContent = aqiData.aqi;
-                const { status, color } = getAqiStatus(aqiData.aqi);
-                aqiStatusEl.textContent = status;
-                aqiStatusEl.style.backgroundColor = color;
-            } else {
-                cityNameEl.textContent = weatherData ? weatherData.name : cityName;
-                updateTimeEl.textContent = 'Last updated: N/A';
-                aqiValueEl.textContent = "N/A";
-                aqiStatusEl.textContent = "No Data";
-                aqiStatusEl.style.backgroundColor = "#7f8c8d";
-            }
-
-            // --- WEATHER DATA FIX ---
-            if (weatherData && weatherData.main) {
-                tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
-                humidityValueEl.textContent = `${weatherData.main.humidity}%`;
-                windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
-            } else {
-                tempValueEl.textContent = "--°C";
-                humidityValueEl.textContent = "--%";
-                windValueEl.textContent = "-- km/h";
-            }
-            
-            forecastTextEl.textContent = generateForecast(aqiData, weatherData);
-            if ('Notification' in window) {
-                updateNotificationButtonState();
-            }
-
-            loadingDiv.classList.add('hidden');
-            dataContentDiv.classList.remove('hidden');
-        }
-
-        function handleError(message) {
-            const dataContentDiv = document.getElementById('data-content');
-            const loadingDiv = document.getElementById('loading');
-            const cityNameEl = document.getElementById('city-name');
-            const aqiValueEl = document.getElementById('aqi-value');
-            const forecastTextEl = document.getElementById('forecast-text');
-
-            dataContentDiv.classList.remove('hidden');
-            loadingDiv.classList.add('hidden');
-            cityNameEl.textContent = "An Error Occurred";
-            aqiValueEl.textContent = "!";
-            let displayMessage = typeof message === 'string' ? message : message.message;
-            if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
-            forecastTextEl.textContent = displayMessage;
-        }
-        
-        function generateForecast(aqiData, weatherData) {
-            const aqi = aqiData ? aqiData.aqi : null;
-            const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
-            const { advice } = getAqiStatus(aqi);
-            if (!aqi || !windSpeed) return advice;
-            let forecast = advice;
-            if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
-            else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
-            else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
-            return forecast;
-        }
-        
-        function getAqiStatus(aqi) {
-            if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
-            if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
-            if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
-            if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
-            if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
-            return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
-        }
-
-        function fetchWithTimeout(url, timeout = 10000) {
-            return new Promise((resolve, reject) => {
-                const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
-                fetch(url).then(response => {
-                    clearTimeout(timer);
-                    resolve(response);
-                }, err => {
-                    clearTimeout(timer);
-                    reject(err);
-                });
-            });
-        }
-
-        // --- Notification Logic ---
-        function handleNotificationClick() {
-            const permission = Notification.permission;
-            if (permission === "granted") {
-                toggleCitySubscription();
-            } else if (permission === "denied") {
-                alert("You have previously blocked notifications. Please enable them in your browser's site settings.");
-            } else {
-                notificationModal.classList.remove('hidden');
-            }
-        }
-
-        function toggleCitySubscription() {
-            const cityName = latestAqiData?.city?.name;
-            if (!cityName) return;
-
-            const cityIndex = subscribedCities.indexOf(cityName);
-            if (cityIndex > -1) {
-                subscribedCities.splice(cityIndex, 1);
-                 new Notification(`${cityName} Unsubscribed`, { body: "You will no longer receive alerts for this city.", icon: 'https://placehold.co/32x32/9ca3af/ffffff?text=X' });
-            } else {
-                subscribedCities.push(cityName);
-                new Notification(`${cityName} Subscribed!`, { body: "You will now receive air quality alerts for this city.", icon: 'https://placehold.co/32x32/3498db/ffffff?text=AQ' });
-            }
-            
-            localStorage.setItem('subscribedCities', JSON.stringify(subscribedCities));
-            updateNotificationButtonState();
-        }
-
-        function requestBrowserPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    toggleCitySubscription();
-                }
-                updateNotificationButtonState();
-            });
-        }
-        
-        function updateNotificationButtonState() {
-            const permission = Notification.permission;
-            const cityName = latestAqiData?.city?.name;
-
-            notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
-            notifyBtn.disabled = false;
-
-            if (permission === 'denied') {
-                notifyBtn.textContent = 'Notifications Blocked';
-                notifyBtn.disabled = true;
-                notifyBtn.classList.add('bg-red-500');
-            } else if (permission === 'granted') {
-                if (cityName && subscribedCities.includes(cityName)) {
-                    notifyBtn.textContent = 'Alerts Active';
-                    notifyBtn.classList.add('bg-green-500');
-                } else {
-                    notifyBtn.textContent = 'Get Alerts for this City';
+                    notifyBtn.textContent = 'Enable Notifications';
                     notifyBtn.classList.add('bg-blue-500');
                 }
-            } else {
-                notifyBtn.textContent = 'Enable Notifications';
-                notifyBtn.classList.add('bg-blue-500');
             }
-        }
+        });
     </script>
 </body>
 </html>
