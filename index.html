@@ -5,25 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- SEO: Title Tag -->
-    <title>Live Air Quality Index (AQI) Map - Real-time Pollution Data</title>
+    <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
 
     <!-- SEO: Meta Tags -->
-    <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map.">
-    <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, air pollution monitor">
-    <meta name="author" content="Digital Minds Team">
-    <link rel="canonical" href="https://air-quality-monitor-3.netlify.app" /> <!-- Replace with your actual URL -->
+    <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
+    <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, ahmed salem, web developer, portfolio">
+    <meta name="author" content="Ahmed Salem">
+    <link rel="canonical" href="https://your-website-url.com" /> <!-- Replace with your actual URL -->
 
     <!-- SEO: Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
-    <meta property="og:title" content="Live Air Quality Index (AQI) Map">
+    <meta property="og:url" content="https://your-website-url.com"> <!-- Replace with your actual URL -->
+    <meta property="og:title" content="Air Quality Monitor - Live AQI & Pollution Map">
     <meta property="og:description" content="Track real-time air quality and pollution levels with our interactive map.">
     <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
 
     <!-- SEO: Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
-    <meta property="twitter:title" content="Live Air Quality Index (AQI) Map">
+    <meta property="twitter:url" content="https://your-website-url.com"> <!-- Replace with your actual URL -->
+    <meta property="twitter:title" content="Air Quality Monitor - Live AQI & Pollution Map">
     <meta property="twitter:description" content="Track real-time air quality and pollution levels with our interactive map.">
     <meta property="twitter:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
 
@@ -37,19 +37,19 @@
     <!-- Google Fonts for better language support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- LeafletJS for maps -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha26-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <!-- Custom Styles -->
     <style>
-        body { font-family: 'Noto Sans', sans-serif; }
-        #map { height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
+        #map-container { height: 100vh; width: 100vw; }
         .loader {
             border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
+            border-top: 5px solid #3b82f6;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -59,341 +59,547 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .hero-bg {
+             background-color: #111827;
+             background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0);
+             background-size: 25px 25px;
+        }
     </style>
 </head>
-<body class="font-sans">
+<body class="font-sans text-gray-800 bg-gray-50">
 
-    <div class="relative">
-        <div id="map"></div>
+    <!-- Landing Page Section -->
+    <div id="landing-page">
+        <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-20">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="flex items-center space-x-2">
+                     <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png" alt="Logo" class="h-8 w-8">
+                     <h1 class="text-xl font-bold text-white">Air Quality Monitor</h1>
+                </a>
+                <a href="#map" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Launch Map</a>
+            </nav>
+        </header>
 
-        <div id="data-panel" class="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg w-80 max-w-sm hidden">
-            <div id="loading" class="flex justify-center items-center h-48">
-                <div class="loader"></div>
+        <!-- Hero Section -->
+        <section class="hero-bg text-white pt-32 pb-20 text-center">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Breathe Clearer. Live Better.</h2>
+                <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
+                <a href="#map" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-transform transform hover:scale-105 inline-block">Launch Live Map</a>
             </div>
+        </section>
 
-            <div id="data-content" class="hidden">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <h2 id="city-name" class="text-xl font-bold text-gray-800">...</h2>
-                        <p id="update-time" class="text-xs text-gray-500">...</p>
-                    </div>
-                    <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400">Enable Notifications</button>
-                </div>
-
-                <hr class="my-3">
-
-                <div class="text-center">
-                    <p class="text-sm text-gray-600">Air Quality Index (AQI)</p>
-                    <div id="aqi-value" class="text-6xl font-bold my-2 text-gray-700">--</div>
-                    <div id="aqi-status" class="px-3 py-1 text-white rounded-full text-sm inline-block bg-gray-400">...</div>
-                </div>
-
-                <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-                    <div>
-                        <p class="text-xs text-gray-500">Temp</p>
-                        <p id="temp-value" class="font-bold text-lg">--°C</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500">Humidity</p>
-                        <p id="humidity-value" class="font-bold text-lg">--%</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500">Wind</p>
-                        <p id="wind-value" class="font-bold text-lg">-- km/h</p>
-                    </div>
-                </div>
-
-                <div class="mt-4 bg-gray-100 p-2 rounded-lg">
-                    <h4 class="font-bold text-sm">Forecast & Health Advice:</h4>
-                    <p id="forecast-text" class="text-xs text-gray-700">Analyzing data...</p>
-                </div>
-                 <div class="mt-4 text-center text-xs text-gray-500">
-                     <p>Powered by the nearest ground-station and weather data.</p>
+        <!-- Features Section -->
+        <section id="features" class="bg-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                 <h3 class="text-3xl font-bold mb-2">Why Use Our Monitor?</h3>
+                 <p class="text-gray-600 mb-12">Everything you need to stay informed about air quality.</p>
+                 <div class="grid md:grid-cols-3 gap-8">
+                     <div class="p-6 bg-gray-100 rounded-lg">
+                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <h4 class="text-xl font-bold mb-2">Live Global Data</h4>
+                        <p class="text-gray-600">Get up-to-the-minute AQI data from thousands of stations worldwide. Click anywhere on the map to get started.</p>
+                     </div>
+                     <div class="p-6 bg-gray-100 rounded-lg">
+                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h4 class="text-xl font-bold mb-2">Health Recommendations</h4>
+                        <p class="text-gray-600">Receive simple, actionable advice based on the current air quality to protect your health.</p>
+                     </div>
+                     <div class="p-6 bg-gray-100 rounded-lg">
+                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <h4 class="text-xl font-bold mb-2">Weather & Forecast</h4>
+                        <p class="text-gray-600">See current weather conditions and a forecast that helps you plan your outdoor activities safely.</p>
+                     </div>
                  </div>
             </div>
-        </div>
+        </section>
+
+        <!-- Meet the Developer Section -->
+        <section id="developer" class="bg-gray-800 text-white py-20">
+            <div class="container mx-auto px-6">
+                <div class="md:flex items-center">
+                    <div class="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
+                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhOJa5Bv82i-fJSIAcGOg8w9GS9Ls41a8BXT2p62I3953bS-B36M-kjklJad7bM_ZVv65QcmPdTfvsrYtdCnn2wbF6CCw8_qwSk3w2y9f3F-0wm8Iy5wKLKeUGhiqxs58ZgRyNgnJBI57WA8Cp-LsUpr5dIzn6fKU0adeodZgaEQa1_wNsQohd3CK6Zus/s1011/IMG-20241204-WA0010%20-%20Copy.jpg" alt="Ahmed Salem" class="w-48 h-48 rounded-full mx-auto md:mx-0 shadow-lg object-cover">
+                    </div>
+                    <div class="md:w-2/3 md:pl-12">
+                        <h3 class="text-3xl font-bold mb-2">Meet the Developer</h3>
+                        <h4 class="text-2xl font-semibold text-blue-400 mb-4">Ahmed Salem</h4>
+                        <p class="text-gray-300 mb-6">
+                            A motivated and passionate student developer with a strong foundation in AI Web Development and Odoo ERP systems. This project was built to apply technical skills in a real-world context, creating a tool that is both useful and accessible. With experience in leading tech initiatives and training at the Microsoft Academy in Qaliobia, Ahmed is passionate about using technology to solve problems and create value.
+                        </p>
+                        <div class="flex space-x-4">
+                            <a href="https://linkedin.com/in/ahmedsalem-khalifa" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                            </a>
+                            <a href="mailto:asalemkhalifa@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-900 text-white text-center py-6">
+            <p>&copy; 2024 Air Quality Monitor. Developed by Ahmed Salem. All rights reserved.</p>
+        </footer>
     </div>
-    
-    <!-- Custom Notification Modal -->
-    <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
-        <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
-            <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
-            <p class="text-sm text-gray-600 my-4">
-                This will allow the site to send you notifications. You can then choose which cities you want alerts for.
-            </p>
-            <div class="flex justify-end gap-4">
-                <button id="modal-deny-btn" class="px-4 py-2 rounded text-gray-700 bg-gray-200 hover:bg-gray-300">Deny</button>
-                <button id="modal-allow-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">Allow</button>
+
+    <!-- Map & App Section (Initially Hidden) -->
+    <div id="map-view" class="hidden">
+        <div id="map-container" class="relative">
+            <div id="map"></div>
+
+            <!-- Geolocation Button -->
+            <button id="locate-btn" class="absolute bottom-4 left-4 z-[1000] bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Find my location">
+                <svg id="locate-icon" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor" class="text-gray-600">
+                    <path d="M0 0h24v24H0V0z" fill="none"/>
+                    <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                </svg>
+            </button>
+
+            <div id="data-panel" class="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg w-80 max-w-sm hidden">
+                <div id="loading" class="flex justify-center items-center h-48">
+                    <div class="loader"></div>
+                </div>
+
+                <div id="data-content" class="hidden">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="city-name" class="text-xl font-bold text-gray-800">...</h2>
+                            <p id="update-time" class="text-xs text-gray-500">...</p>
+                        </div>
+                        <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400">Enable Notifications</button>
+                    </div>
+
+                    <hr class="my-3">
+
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Air Quality Index (AQI)</p>
+                        <div id="aqi-value" class="text-6xl font-bold my-2 text-gray-700">--</div>
+                        <div id="aqi-status" class="px-3 py-1 text-white rounded-full text-sm inline-block bg-gray-400">...</div>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-3 gap-2 text-center">
+                        <div>
+                            <p class="text-xs text-gray-500">Temp</p>
+                            <p id="temp-value" class="font-bold text-lg">--°C</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Humidity</p>
+                            <p id="humidity-value" class="font-bold text-lg">--%</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Wind</p>
+                            <p id="wind-value" class="font-bold text-lg">-- km/h</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-gray-100 p-2 rounded-lg">
+                        <h4 class="font-bold text-sm">Forecast & Health Advice:</h4>
+                        <p id="forecast-text" class="text-xs text-gray-700">Analyzing data...</p>
+                    </div>
+                     <div class="mt-4 text-center text-xs text-gray-500">
+                         <p>Powered by the nearest ground-station and weather data.</p>
+                     </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Custom Notification Modal -->
+        <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+                <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
+                <p class="text-sm text-gray-600 my-4">
+                    This will allow the site to send you notifications. You can then choose which cities you want alerts for.
+                </p>
+                <div class="flex justify-end gap-4">
+                    <button id="modal-deny-btn" class="px-4 py-2 rounded text-gray-700 bg-gray-200 hover:bg-gray-300">Deny</button>
+                    <button id="modal-allow-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">Allow</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Geolocation Error Modal -->
+        <div id="location-error-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+                <h3 class="text-lg font-bold">Location Error</h3>
+                <p id="location-error-message" class="text-sm text-gray-600 my-4">
+                    Could not get your location.
+                </p>
+                <div class="flex justify-end gap-4">
+                    <button id="location-error-ok-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">OK</button>
+                </div>
             </div>
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- !! IMPORTANT !! ---
-            const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
-            const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
+            const landingPage = document.getElementById('landing-page');
+            const mapView = document.getElementById('map-view');
+            let mapInitialized = false;
 
-            // --- UI Elements & State ---
-            const dataPanel = document.getElementById('data-panel');
-            const loadingDiv = document.getElementById('loading');
-            const dataContentDiv = document.getElementById('data-content');
-            const cityNameEl = document.getElementById('city-name');
-            const updateTimeEl = document.getElementById('update-time');
-            const aqiValueEl = document.getElementById('aqi-value');
-            const aqiStatusEl = document.getElementById('aqi-status');
-            const tempValueEl = document.getElementById('temp-value');
-            const humidityValueEl = document.getElementById('humidity-value');
-            const windValueEl = document.getElementById('wind-value');
-            const forecastTextEl = document.getElementById('forecast-text');
-            const notifyBtn = document.getElementById('notify-btn');
-            const notificationModal = document.getElementById('notification-modal');
-            const modalAllowBtn = document.getElementById('modal-allow-btn');
-            const modalDenyBtn = document.getElementById('modal-deny-btn');
-
-            let latestAqiData = null;
-            let subscribedCities = [];
-
-            // --- Initial Setup ---
-            const savedCities = localStorage.getItem('subscribedCities');
-            if (savedCities) {
-                subscribedCities = JSON.parse(savedCities);
-            }
-            if (!('Notification' in window)) {
-                notifyBtn.disabled = true;
-                notifyBtn.textContent = "Not Supported";
-            }
-
-            // --- Map Setup ---
-            const map = L.map('map').setView([40, -95], 4);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            let marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
-
-            // --- Event Listeners ---
-            map.on('click', function(e) {
-                const { lat, lng } = e.latlng;
-                marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
-                dataPanel.classList.remove('hidden');
-                loadingDiv.classList.remove('hidden');
-                dataContentDiv.classList.add('hidden');
-                fetchAllDataForLocation(lat, lng); 
-            });
-
-            notifyBtn.addEventListener('click', handleNotificationClick);
-            modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
-            modalAllowBtn.addEventListener('click', () => {
-                notificationModal.classList.add('hidden');
-                requestBrowserPermission();
-            });
-
-            // --- Core Functions ---
-            async function fetchAllDataForLocation(lat, lng) {
-                try {
-                    const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
-                    latestAqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
-                    const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
-                    if (!latestAqiData && !weatherData) {
-                        handleError("Failed to fetch data. The location might be too remote.");
-                    } else {
-                        updateUIPanel({ aqiData: latestAqiData, weatherData });
+            // --- SPA Routing Logic ---
+            function handleRouteChange() {
+                if (window.location.hash === '#map') {
+                    landingPage.classList.add('hidden');
+                    mapView.classList.remove('hidden');
+                    if (!mapInitialized) {
+                        initializeMapApp();
+                        mapInitialized = true;
                     }
-                } catch (error) {
-                    handleError(error);
+                } else {
+                    landingPage.classList.remove('hidden');
+                    mapView.classList.add('hidden');
                 }
             }
+
+            // Listen for hash changes (e.g., back/forward buttons)
+            window.addEventListener('hashchange', handleRouteChange);
+
+            // Initial route check on page load
+            handleRouteChange();
             
-            async function fetchAqiData(lat, lng) {
-                const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
-                const response = await fetchWithTimeout(url);
-                if (!response.ok) throw new Error('AQI data request failed');
-                const data = await response.json();
-                if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
-                return data.data;
-            }
+            // Handle clicks on any link pointing to #map
+            document.querySelectorAll('a[href="#map"]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.hash = '#map';
+                });
+            });
 
-            async function fetchWeatherData(lat, lng) {
-                const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
-                const response = await fetchWithTimeout(url);
-                if (!response.ok) throw new Error('Weather data request failed');
-                return await response.json();
-            }
 
-            function updateUIPanel({ aqiData, weatherData }) {
-                let cityName = "Unknown Location";
-                if (aqiData) {
-                    cityName = aqiData.city.name;
-                    cityNameEl.textContent = cityName.length > 45 ? cityName.substring(0, 45) + '...' : cityName;
+            // --- Map Application Logic ---
+            function initializeMapApp() {
+                // --- !! IMPORTANT !! ---
+                const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
+                const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
+
+                // --- UI Elements & State ---
+                const dataPanel = document.getElementById('data-panel');
+                const loadingDiv = document.getElementById('loading');
+                const dataContentDiv = document.getElementById('data-content');
+                const cityNameEl = document.getElementById('city-name');
+                const updateTimeEl = document.getElementById('update-time');
+                const aqiValueEl = document.getElementById('aqi-value');
+                const aqiStatusEl = document.getElementById('aqi-status');
+                const tempValueEl = document.getElementById('temp-value');
+                const humidityValueEl = document.getElementById('humidity-value');
+                const windValueEl = document.getElementById('wind-value');
+                const forecastTextEl = document.getElementById('forecast-text');
+                const notifyBtn = document.getElementById('notify-btn');
+                const notificationModal = document.getElementById('notification-modal');
+                const modalAllowBtn = document.getElementById('modal-allow-btn');
+                const modalDenyBtn = document.getElementById('modal-deny-btn');
+                const locateBtn = document.getElementById('locate-btn');
+                const locateIcon = document.getElementById('locate-icon');
+                const locationErrorModal = document.getElementById('location-error-modal');
+                const locationErrorMessage = document.getElementById('location-error-message');
+                const locationErrorOkBtn = document.getElementById('location-error-ok-btn');
+
+                let latestAqiData = null;
+                let subscribedCities = [];
+                let map;
+                let marker;
+
+                // --- Initial Setup ---
+                const savedCities = localStorage.getItem('subscribedCities');
+                if (savedCities) {
+                    subscribedCities = JSON.parse(savedCities);
+                }
+                if (!('Notification' in window)) {
+                    notifyBtn.disabled = true;
+                    notifyBtn.textContent = "Not Supported";
+                }
+                
+                // --- Map Setup ---
+                map = L.map('map').setView([40, -95], 4);
+                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
+
+                // Invalidate map size to ensure it renders correctly after being un-hidden
+                setTimeout(() => {
+                    map.invalidateSize();
+                     // Try to get user's location on map load
+                    getUserLocation();
+                }, 100);
+
+                // --- Event Listeners ---
+                map.on('click', function(e) {
+                    const { lat, lng } = e.latlng;
+                    marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
+                    dataPanel.classList.remove('hidden');
+                    loadingDiv.classList.remove('hidden');
+                    dataContentDiv.classList.add('hidden');
+                    fetchAllDataForLocation(lat, lng); 
+                });
+
+                locateBtn.addEventListener('click', getUserLocation);
+                locationErrorOkBtn.addEventListener('click', () => locationErrorModal.classList.add('hidden'));
+                notifyBtn.addEventListener('click', handleNotificationClick);
+                modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
+                modalAllowBtn.addEventListener('click', () => {
+                    notificationModal.classList.add('hidden');
+                    requestBrowserPermission();
+                });
+
+                // --- Geolocation Functions ---
+                function getUserLocation() {
+                    if (navigator.geolocation) {
+                        locateIcon.classList.remove('text-gray-600');
+                        locateIcon.classList.add('text-blue-600');
+                        marker.setPopupContent("Finding your location...").openPopup();
+                        navigator.geolocation.getCurrentPosition(showPosition, showLocationError);
+                    } else {
+                        showLocationError({ message: "Geolocation is not supported by this browser." });
+                    }
+                }
+
+                function showPosition(position) {
+                    locateIcon.classList.remove('text-blue-600');
+                    locateIcon.classList.add('text-gray-600');
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
                     
-                    if (aqiData.time && aqiData.time.s) {
-                        const date = new Date(aqiData.time.s);
-                        if (!isNaN(date.getTime())) {
-                            const timeString = date.toLocaleTimeString('en-US');
-                            const timeZoneString = aqiData.time.tz ? `(GMT${aqiData.time.tz})` : '';
-                            updateTimeEl.textContent = `Last updated: ${timeString} ${timeZoneString}`;
+                    map.setView([lat, lng], 13);
+                    marker.setLatLng([lat, lng]).setPopupContent(`Fetching data for your location...`).openPopup();
+                    
+                    dataPanel.classList.remove('hidden');
+                    loadingDiv.classList.remove('hidden');
+                    dataContentDiv.classList.add('hidden');
+                    fetchAllDataForLocation(lat, lng);
+                }
+
+                function showLocationError(error) {
+                    locateIcon.classList.remove('text-blue-600');
+                    locateIcon.classList.add('text-gray-600');
+                    let message = "An unknown error occurred.";
+                    if(error && error.code) {
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                message = "You denied the request for Geolocation. Please enable location permissions in your browser settings to use this feature.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                message = "Location information is unavailable.";
+                                break;
+                            case error.TIMEOUT:
+                                message = "The request to get user location timed out.";
+                                break;
+                        }
+                    }
+                    if (error && error.message) {
+                        message = error.message;
+                    }
+
+                    locationErrorMessage.textContent = message;
+                    locationErrorModal.classList.remove('hidden');
+                    marker.setPopupContent('Click anywhere on the map.');
+                }
+
+                // --- Core Data Functions ---
+                async function fetchAllDataForLocation(lat, lng) {
+                    try {
+                        const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
+                        latestAqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
+                        const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
+                        if (!latestAqiData && !weatherData) {
+                            handleError("Failed to fetch data. The location might be too remote.");
                         } else {
-                            updateTimeEl.textContent = 'Last updated: Invalid Time';
+                            updateUIPanel({ aqiData: latestAqiData, weatherData });
+                        }
+                    } catch (error) {
+                        handleError(error);
+                    }
+                }
+                
+                async function fetchAqiData(lat, lng) {
+                    const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
+                    const response = await fetchWithTimeout(url);
+                    if (!response.ok) throw new Error('AQI data request failed');
+                    const data = await response.json();
+                    if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
+                    return data.data;
+                }
+
+                async function fetchWeatherData(lat, lng) {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
+                    const response = await fetchWithTimeout(url);
+                    if (!response.ok) throw new Error('Weather data request failed');
+                    return await response.json();
+                }
+
+                // --- UI Update Functions ---
+                function updateUIPanel({ aqiData, weatherData }) {
+                    let cityName = "Unknown Location";
+                    if (aqiData) {
+                        cityName = aqiData.city.name;
+                        cityNameEl.textContent = cityName.length > 45 ? cityName.substring(0, 45) + '...' : cityName;
+                        
+                        if (aqiData.time && aqiData.time.s) {
+                            const date = new Date(aqiData.time.s);
+                            if (!isNaN(date.getTime())) {
+                                const timeString = date.toLocaleTimeString('en-US');
+                                const timeZoneString = aqiData.time.tz ? `(GMT${aqiData.time.tz})` : '';
+                                updateTimeEl.textContent = `Last updated: ${timeString} ${timeZoneString}`;
+                            } else {
+                                updateTimeEl.textContent = 'Last updated: Invalid Time';
+                            }
+                        } else {
+                            updateTimeEl.textContent = 'Last updated: Not available';
+                        }
+
+                        aqiValueEl.textContent = aqiData.aqi;
+                        const { status, color } = getAqiStatus(aqiData.aqi);
+                        aqiStatusEl.textContent = status;
+                        aqiStatusEl.style.backgroundColor = color;
+                    } else {
+                        cityNameEl.textContent = weatherData ? weatherData.name : cityName;
+                        updateTimeEl.textContent = 'Last updated: N/A';
+                        aqiValueEl.textContent = "N/A";
+                        aqiStatusEl.textContent = "No Data";
+                        aqiStatusEl.style.backgroundColor = "#7f8c8d";
+                    }
+
+                    if (weatherData && weatherData.main) {
+                        tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
+                        humidityValueEl.textContent = `${weatherData.main.humidity}%`;
+                        windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
+                    } else {
+                        tempValueEl.textContent = "--°C";
+                        humidityValueEl.textContent = "--%";
+                        windValueEl.textContent = "-- km/h";
+                    }
+                    
+                    forecastTextEl.textContent = generateForecast(aqiData, weatherData);
+                    if ('Notification' in window) {
+                        updateNotificationButtonState();
+                    }
+
+                    loadingDiv.classList.add('hidden');
+                    dataContentDiv.classList.remove('hidden');
+                }
+
+                function handleError(message) {
+                    loadingDiv.classList.add('hidden');
+                    dataContentDiv.classList.remove('hidden');
+                    cityNameEl.textContent = "An Error Occurred";
+                    aqiValueEl.textContent = "!";
+                    let displayMessage = typeof message === 'string' ? message : message.message;
+                    if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
+                    forecastTextEl.textContent = displayMessage;
+                }
+                
+                // --- Helper Functions ---
+                function generateForecast(aqiData, weatherData) {
+                    const aqi = aqiData ? aqiData.aqi : null;
+                    const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
+                    const { advice } = getAqiStatus(aqi);
+                    if (!aqi || !windSpeed) return advice;
+                    let forecast = advice;
+                    if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
+                    else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
+                    else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
+                    return forecast;
+                }
+                
+                function getAqiStatus(aqi) {
+                    if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
+                    if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
+                    if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
+                    if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
+                    if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
+                    return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
+                }
+
+                function fetchWithTimeout(url, timeout = 10000) {
+                    return new Promise((resolve, reject) => {
+                        const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
+                        fetch(url).then(response => {
+                            clearTimeout(timer);
+                            resolve(response);
+                        }, err => {
+                            clearTimeout(timer);
+                            reject(err);
+                        });
+                    });
+                }
+
+                // --- Notification Logic ---
+                function handleNotificationClick() {
+                    const permission = Notification.permission;
+                    if (permission === "granted") {
+                        toggleCitySubscription();
+                    } else if (permission === "denied") {
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-[3000] flex justify-center items-center';
+                        modal.innerHTML = `
+                            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+                                <h3 class="text-lg font-bold">Notifications Blocked</h3>
+                                <p class="text-sm text-gray-600 my-4">You have previously blocked notifications. Please enable them in your browser's site settings to receive alerts.</p>
+                                <button class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">OK</button>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+                        modal.querySelector('button').onclick = () => document.body.removeChild(modal);
+                    } else {
+                        notificationModal.classList.remove('hidden');
+                    }
+                }
+
+                function toggleCitySubscription() {
+                    const cityName = latestAqiData?.city?.name;
+                    if (!cityName) return;
+
+                    const cityIndex = subscribedCities.indexOf(cityName);
+                    if (cityIndex > -1) {
+                        subscribedCities.splice(cityIndex, 1);
+                         new Notification(`${cityName} Unsubscribed`, { body: "You will no longer receive alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
+                    } else {
+                        subscribedCities.push(cityName);
+                        new Notification(`${cityName} Subscribed!`, { body: "You will now receive air quality alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
+                    }
+                    
+                    localStorage.setItem('subscribedCities', JSON.stringify(subscribedCities));
+                    updateNotificationButtonState();
+                }
+
+                function requestBrowserPermission() {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            toggleCitySubscription();
+                        }
+                        updateNotificationButtonState();
+                    });
+                }
+                
+                function updateNotificationButtonState() {
+                    const permission = Notification.permission;
+                    const cityName = latestAqiData?.city?.name;
+
+                    notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
+                    notifyBtn.disabled = false;
+
+                    if (permission === 'denied') {
+                        notifyBtn.textContent = 'Notifications Blocked';
+                        notifyBtn.disabled = true;
+                        notifyBtn.classList.add('bg-red-500');
+                    } else if (permission === 'granted') {
+                        if (cityName && subscribedCities.includes(cityName)) {
+                            notifyBtn.textContent = 'Alerts Active';
+                            notifyBtn.classList.add('bg-green-500');
+                        } else {
+                            notifyBtn.textContent = 'Get Alerts for this City';
+                            notifyBtn.classList.add('bg-blue-500');
                         }
                     } else {
-                        updateTimeEl.textContent = 'Last updated: Not available';
-                    }
-
-                    aqiValueEl.textContent = aqiData.aqi;
-                    const { status, color } = getAqiStatus(aqiData.aqi);
-                    aqiStatusEl.textContent = status;
-                    aqiStatusEl.style.backgroundColor = color;
-                } else {
-                    cityNameEl.textContent = weatherData ? weatherData.name : cityName;
-                    updateTimeEl.textContent = 'Last updated: N/A';
-                    aqiValueEl.textContent = "N/A";
-                    aqiStatusEl.textContent = "No Data";
-                    aqiStatusEl.style.backgroundColor = "#7f8c8d";
-                }
-
-                if (weatherData && weatherData.main) {
-                    tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
-                    humidityValueEl.textContent = `${weatherData.main.humidity}%`;
-                    windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
-                } else {
-                    tempValueEl.textContent = "--°C";
-                    humidityValueEl.textContent = "--%";
-                    windValueEl.textContent = "-- km/h";
-                }
-                
-                forecastTextEl.textContent = generateForecast(aqiData, weatherData);
-                if ('Notification' in window) {
-                    updateNotificationButtonState();
-                }
-
-                loadingDiv.classList.add('hidden');
-                dataContentDiv.classList.remove('hidden');
-            }
-
-            function handleError(message) {
-                const dataContentDiv = document.getElementById('data-content');
-                const loadingDiv = document.getElementById('loading');
-                const cityNameEl = document.getElementById('city-name');
-                const aqiValueEl = document.getElementById('aqi-value');
-                const forecastTextEl = document.getElementById('forecast-text');
-
-                dataContentDiv.classList.remove('hidden');
-                loadingDiv.classList.add('hidden');
-                cityNameEl.textContent = "An Error Occurred";
-                aqiValueEl.textContent = "!";
-                let displayMessage = typeof message === 'string' ? message : message.message;
-                if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
-                forecastTextEl.textContent = displayMessage;
-            }
-            
-            function generateForecast(aqiData, weatherData) {
-                const aqi = aqiData ? aqiData.aqi : null;
-                const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
-                const { advice } = getAqiStatus(aqi);
-                if (!aqi || !windSpeed) return advice;
-                let forecast = advice;
-                if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
-                else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
-                else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
-                return forecast;
-            }
-            
-            function getAqiStatus(aqi) {
-                if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
-                if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
-                if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
-                if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
-                if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
-                return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
-            }
-
-            function fetchWithTimeout(url, timeout = 10000) {
-                return new Promise((resolve, reject) => {
-                    const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
-                    fetch(url).then(response => {
-                        clearTimeout(timer);
-                        resolve(response);
-                    }, err => {
-                        clearTimeout(timer);
-                        reject(err);
-                    });
-                });
-            }
-
-            // --- Notification Logic ---
-            function handleNotificationClick() {
-                const permission = Notification.permission;
-                if (permission === "granted") {
-                    toggleCitySubscription();
-                } else if (permission === "denied") {
-                    // Use a custom modal/alert in a real app instead of window.alert
-                    const modal = document.createElement('div');
-                    modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-[3000] flex justify-center items-center';
-                    modal.innerHTML = `
-                        <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
-                            <h3 class="text-lg font-bold">Notifications Blocked</h3>
-                            <p class="text-sm text-gray-600 my-4">You have previously blocked notifications. Please enable them in your browser's site settings to receive alerts.</p>
-                            <button class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">OK</button>
-                        </div>
-                    `;
-                    document.body.appendChild(modal);
-                    modal.querySelector('button').onclick = () => document.body.removeChild(modal);
-                } else {
-                    notificationModal.classList.remove('hidden');
-                }
-            }
-
-            function toggleCitySubscription() {
-                const cityName = latestAqiData?.city?.name;
-                if (!cityName) return;
-
-                const cityIndex = subscribedCities.indexOf(cityName);
-                if (cityIndex > -1) {
-                    subscribedCities.splice(cityIndex, 1);
-                     new Notification(`${cityName} Unsubscribed`, { body: "You will no longer receive alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
-                } else {
-                    subscribedCities.push(cityName);
-                    new Notification(`${cityName} Subscribed!`, { body: "You will now receive air quality alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
-                }
-                
-                localStorage.setItem('subscribedCities', JSON.stringify(subscribedCities));
-                updateNotificationButtonState();
-            }
-
-            function requestBrowserPermission() {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        toggleCitySubscription();
-                    }
-                    updateNotificationButtonState();
-                });
-            }
-            
-            function updateNotificationButtonState() {
-                const permission = Notification.permission;
-                const cityName = latestAqiData?.city?.name;
-
-                notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
-                notifyBtn.disabled = false;
-
-                if (permission === 'denied') {
-                    notifyBtn.textContent = 'Notifications Blocked';
-                    notifyBtn.disabled = true;
-                    notifyBtn.classList.add('bg-red-500');
-                } else if (permission === 'granted') {
-                    if (cityName && subscribedCities.includes(cityName)) {
-                        notifyBtn.textContent = 'Alerts Active';
-                        notifyBtn.classList.add('bg-green-500');
-                    } else {
-                        notifyBtn.textContent = 'Get Alerts for this City';
+                        notifyBtn.textContent = 'Enable Notifications';
                         notifyBtn.classList.add('bg-blue-500');
                     }
-                } else {
-                    notifyBtn.textContent = 'Enable Notifications';
-                    notifyBtn.classList.add('bg-blue-500');
                 }
-            }
+            } // End of initializeMapApp
         });
     </script>
 </body>
