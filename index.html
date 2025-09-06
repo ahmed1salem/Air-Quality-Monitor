@@ -48,6 +48,8 @@
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
         #map-container { height: 100vh; width: 100vw; }
+        /* --- FIX: Added styles for the map div --- */
+        #map { height: 100%; width: 100%; z-index: 1; }
         .loader {
             border: 5px solid #f3f3f3;
             border-top: 5px solid #3b82f6;
@@ -97,19 +99,19 @@
                  <p class="text-gray-600 mb-12">Everything you need to stay informed about air quality.</p>
                  <div class="grid md:grid-cols-3 gap-8">
                      <div class="p-6 bg-gray-100 rounded-lg">
-                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <h4 class="text-xl font-bold mb-2">Live Global Data</h4>
-                        <p class="text-gray-600">Get up-to-the-minute AQI data from thousands of stations worldwide. Click anywhere on the map to get started.</p>
+                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                         <h4 class="text-xl font-bold mb-2">Live Global Data</h4>
+                         <p class="text-gray-600">Get up-to-the-minute AQI data from thousands of stations worldwide. Click anywhere on the map to get started.</p>
                      </div>
                      <div class="p-6 bg-gray-100 rounded-lg">
-                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <h4 class="text-xl font-bold mb-2">Health Recommendations</h4>
-                        <p class="text-gray-600">Receive simple, actionable advice based on the current air quality to protect your health.</p>
+                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                         <h4 class="text-xl font-bold mb-2">Health Recommendations</h4>
+                         <p class="text-gray-600">Receive simple, actionable advice based on the current air quality to protect your health.</p>
                      </div>
                      <div class="p-6 bg-gray-100 rounded-lg">
-                        <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <h4 class="text-xl font-bold mb-2">Weather & Forecast</h4>
-                        <p class="text-gray-600">See current weather conditions and a forecast that helps you plan your outdoor activities safely.</p>
+                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                         <h4 class="text-xl font-bold mb-2">Weather & Forecast</h4>
+                         <p class="text-gray-600">See current weather conditions and a forecast that helps you plan your outdoor activities safely.</p>
                      </div>
                  </div>
             </div>
@@ -120,22 +122,22 @@
             <div class="container mx-auto px-6">
                 <div class="md:flex items-center">
                     <div class="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
-                        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhOJa5Bv82i-fJSIAcGOg8w9GS9Ls41a8BXT2p62I3953bS-B36M-kjklJad7bM_ZVv65QcmPdTfvsrYtdCnn2wbF6CCw8_qwSk3w2y9f3F-0wm8Iy5wKLKeUGhiqxs58ZgRyNgnJBI57WA8Cp-LsUpr5dIzn6fKU0adeodZgaEQa1_wNsQohd3CK6Zus/s1011/IMG-20241204-WA0010%20-%20Copy.jpg" alt="Ahmed Salem" class="w-48 h-48 rounded-full mx-auto md:mx-0 shadow-lg object-cover">
+                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhOJa5Bv82i-fJSIAcGOg8w9GS9Ls41a8BXT2p62I3953bS-B36M-kjklJad7bM_ZVv65QcmPdTfvsrYtdCnn2wbF6CCw8_qwSk3w2y9f3F-0wm8Iy5wKLKeUGhiqxs58ZgRyNgnJBI57WA8Cp-LsUpr5dIzn6fKU0adeodZgaEQa1_wNsQohd3CK6Zus/s1011/IMG-20241204-WA0010%20-%20Copy.jpg" alt="Ahmed Salem" class="w-48 h-48 rounded-full mx-auto md:mx-0 shadow-lg object-cover">
                     </div>
                     <div class="md:w-2/3 md:pl-12">
-                        <h3 class="text-3xl font-bold mb-2">Meet the Developer</h3>
-                        <h4 class="text-2xl font-semibold text-blue-400 mb-4">Ahmed Salem</h4>
-                        <p class="text-gray-300 mb-6">
-                            A motivated and passionate student developer with a strong foundation in AI Web Development and Odoo ERP systems. This project was built to apply technical skills in a real-world context, creating a tool that is both useful and accessible. With experience in leading tech initiatives and training at the Microsoft Academy in Qaliobia, Ahmed is passionate about using technology to solve problems and create value.
-                        </p>
-                        <div class="flex space-x-4">
-                            <a href="https://linkedin.com/in/ahmedsalem-khalifa" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
-                            </a>
-                            <a href="mailto:asalemkhalifa@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors">
-                                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
-                            </a>
-                        </div>
+                         <h3 class="text-3xl font-bold mb-2">Meet the Developer</h3>
+                         <h4 class="text-2xl font-semibold text-blue-400 mb-4">Ahmed Salem</h4>
+                         <p class="text-gray-300 mb-6">
+                             A motivated and passionate student developer with a strong foundation in AI Web Development and Odoo ERP systems. This project was built to apply technical skills in a real-world context, creating a tool that is both useful and accessible. With experience in leading tech initiatives and training at the Microsoft Academy in Qaliobia, Ahmed is passionate about using technology to solve problems and create value.
+                         </p>
+                         <div class="flex space-x-4">
+                             <a href="https://linkedin.com/in/ahmedsalem-khalifa" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                 <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
+                             </a>
+                             <a href="mailto:asalemkhalifa@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                 <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+                             </a>
+                         </div>
                     </div>
                 </div>
             </div>
@@ -165,15 +167,17 @@
                 </div>
 
                 <div id="data-content" class="hidden relative">
-                    <button id="close-panel-btn" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                    </button>
                     <div class="flex justify-between items-start">
-                        <div class="pr-8">
+                        <div class="pr-2">
                             <h2 id="city-name" class="text-xl font-bold text-gray-800">...</h2>
                             <p id="update-time" class="text-xs text-gray-500">...</p>
                         </div>
-                        <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400 flex-shrink-0">Enable Notifications</button>
+                        <div class="flex items-center flex-shrink-0">
+                            <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400 flex-shrink-0">Enable Notifications</button>
+                             <button id="close-panel-btn" class="ml-2 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            </button>
+                        </div>
                     </div>
 
                     <hr class="my-3">
@@ -253,16 +257,20 @@
                 mapView.classList.toggle('hidden', !isMapVisible);
 
                 if (isMapVisible) {
+                    // Check if the map needs to be created for the first time
                     if (!mapInitialized) {
                         initializeMapApp();
                         mapInitialized = true;
                     }
-                    // Use requestAnimationFrame for a more reliable resize after render
-                    requestAnimationFrame(() => {
+                    
+                    // This is the crucial part. We use a minimal timeout to ensure this code
+                    // runs *after* the browser has finished rendering the layout changes (making the map div visible).
+                    // This tells the map to check its container's size and redraw itself correctly.
+                    setTimeout(function() {
                         if (map) {
                             map.invalidateSize();
                         }
-                    });
+                    }, 0);
                 }
             }
 
@@ -628,4 +636,3 @@
     </script>
 </body>
 </html>
-
