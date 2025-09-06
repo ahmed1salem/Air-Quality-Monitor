@@ -39,9 +39,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <!-- LeafletJS for maps -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- LeafletJS for maps (from Cloudflare CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+
 
     <!-- Custom Styles -->
     <style>
@@ -158,18 +159,21 @@
                 </svg>
             </button>
 
-            <div id="data-panel" class="absolute top-4 right-4 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg w-80 max-w-sm hidden">
+            <div id="data-panel" class="absolute top-4 left-4 right-4 sm:left-auto sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden">
                 <div id="loading" class="flex justify-center items-center h-48">
                     <div class="loader"></div>
                 </div>
 
-                <div id="data-content" class="hidden">
+                <div id="data-content" class="hidden relative">
+                    <button id="close-panel-btn" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
                     <div class="flex justify-between items-start">
-                        <div>
+                        <div class="pr-8">
                             <h2 id="city-name" class="text-xl font-bold text-gray-800">...</h2>
                             <p id="update-time" class="text-xs text-gray-500">...</p>
                         </div>
-                        <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400">Enable Notifications</button>
+                        <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400 flex-shrink-0">Enable Notifications</button>
                     </div>
 
                     <hr class="my-3">
@@ -208,7 +212,7 @@
         
         <!-- Custom Notification Modal -->
         <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
                 <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
                 <p class="text-sm text-gray-600 my-4">
                     This will allow the site to send you notifications. You can then choose which cities you want alerts for.
@@ -222,7 +226,7 @@
 
         <!-- Geolocation Error Modal -->
         <div id="location-error-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
+            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
                 <h3 class="text-lg font-bold">Location Error</h3>
                 <p id="location-error-message" class="text-sm text-gray-600 my-4">
                     Could not get your location.
@@ -239,19 +243,26 @@
             const landingPage = document.getElementById('landing-page');
             const mapView = document.getElementById('map-view');
             let mapInitialized = false;
+            let map = null; // Declare map variable here to be accessible in wider scope
 
             // --- SPA Routing Logic ---
             function handleRouteChange() {
-                if (window.location.hash === '#map') {
-                    landingPage.classList.add('hidden');
-                    mapView.classList.remove('hidden');
+                const isMapVisible = window.location.hash === '#map';
+                
+                landingPage.classList.toggle('hidden', isMapVisible);
+                mapView.classList.toggle('hidden', !isMapVisible);
+
+                if (isMapVisible) {
                     if (!mapInitialized) {
                         initializeMapApp();
                         mapInitialized = true;
                     }
-                } else {
-                    landingPage.classList.remove('hidden');
-                    mapView.classList.add('hidden');
+                    // Use requestAnimationFrame for a more reliable resize after render
+                    requestAnimationFrame(() => {
+                        if (map) {
+                            map.invalidateSize();
+                        }
+                    });
                 }
             }
 
@@ -297,13 +308,19 @@
                 const locationErrorModal = document.getElementById('location-error-modal');
                 const locationErrorMessage = document.getElementById('location-error-message');
                 const locationErrorOkBtn = document.getElementById('location-error-ok-btn');
+                const closePanelBtn = document.getElementById('close-panel-btn');
 
                 let latestAqiData = null;
                 let subscribedCities = [];
-                let map;
                 let marker;
 
-                // --- Initial Setup ---
+                // --- Initial Setup: Check for API Keys first ---
+                if (!WAQI_API_KEY || !OPENWEATHER_API_KEY) {
+                    dataPanel.classList.remove('hidden');
+                    handleError("API Key is missing. Please check the script and add your API keys.");
+                    return; // Stop initialization
+                }
+
                 const savedCities = localStorage.getItem('subscribedCities');
                 if (savedCities) {
                     subscribedCities = JSON.parse(savedCities);
@@ -314,18 +331,14 @@
                 }
                 
                 // --- Map Setup ---
-                map = L.map('map').setView([40, -95], 4);
+                map = L.map('map').setView([40, -95], 4); // Assign to the outer scope map variable
                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
                 marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
 
-                // Invalidate map size to ensure it renders correctly after being un-hidden
-                setTimeout(() => {
-                    map.invalidateSize();
-                     // Try to get user's location on map load
-                    getUserLocation();
-                }, 100);
+                // Get user location on initial map load
+                getUserLocation();
 
                 // --- Event Listeners ---
                 map.on('click', function(e) {
@@ -337,6 +350,9 @@
                     fetchAllDataForLocation(lat, lng); 
                 });
 
+                closePanelBtn.addEventListener('click', () => {
+                    dataPanel.classList.add('hidden');
+                });
                 locateBtn.addEventListener('click', getUserLocation);
                 locationErrorOkBtn.addEventListener('click', () => locationErrorModal.classList.add('hidden'));
                 notifyBtn.addEventListener('click', handleNotificationClick);
@@ -403,13 +419,15 @@
                 async function fetchAllDataForLocation(lat, lng) {
                     try {
                         const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
-                        latestAqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
-                        const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
-                        if (!latestAqiData && !weatherData) {
-                            handleError("Failed to fetch data. The location might be too remote.");
-                        } else {
-                            updateUIPanel({ aqiData: latestAqiData, weatherData });
-                        }
+                        
+                        if(aqiResult.status === 'rejected') throw aqiResult.reason;
+                        if(weatherResult.status === 'rejected') throw weatherResult.reason;
+
+                        latestAqiData = aqiResult.value;
+                        const weatherData = weatherResult.value;
+                        
+                        updateUIPanel({ aqiData: latestAqiData, weatherData });
+
                     } catch (error) {
                         handleError(error);
                     }
@@ -418,7 +436,8 @@
                 async function fetchAqiData(lat, lng) {
                     const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
                     const response = await fetchWithTimeout(url);
-                    if (!response.ok) throw new Error('AQI data request failed');
+                    if (response.status === 401 || response.status === 403) throw new Error('Invalid or expired AQI API Key.');
+                    if (!response.ok) throw new Error(`AQI data request failed with status: ${response.status}`);
                     const data = await response.json();
                     if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
                     return data.data;
@@ -427,7 +446,8 @@
                 async function fetchWeatherData(lat, lng) {
                     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
                     const response = await fetchWithTimeout(url);
-                    if (!response.ok) throw new Error('Weather data request failed');
+                    if (response.status === 401 || response.status === 403) throw new Error('Invalid or expired Weather API Key.');
+                    if (!response.ok) throw new Error(`Weather data request failed with status: ${response.status}`);
                     return await response.json();
                 }
 
@@ -436,7 +456,7 @@
                     let cityName = "Unknown Location";
                     if (aqiData) {
                         cityName = aqiData.city.name;
-                        cityNameEl.textContent = cityName.length > 45 ? cityName.substring(0, 45) + '...' : cityName;
+                        cityNameEl.textContent = cityName.length > 30 ? cityName.substring(0, 30) + '...' : cityName;
                         
                         if (aqiData.time && aqiData.time.s) {
                             const date = new Date(aqiData.time.s);
@@ -488,7 +508,11 @@
                     cityNameEl.textContent = "An Error Occurred";
                     aqiValueEl.textContent = "!";
                     let displayMessage = typeof message === 'string' ? message : message.message;
-                    if (displayMessage.includes('timed out')) displayMessage = "Request took too long. Please try a different area.";
+                    if (displayMessage.includes('timed out')) {
+                        displayMessage = "Request took too long. Please try a different area.";
+                    } else if (displayMessage.toLowerCase().includes('api key')) {
+                        displayMessage += " Please verify the keys in the script are correct and have not expired.";
+                    }
                     forecastTextEl.textContent = displayMessage;
                 }
                 
@@ -604,3 +628,4 @@
     </script>
 </body>
 </html>
+
