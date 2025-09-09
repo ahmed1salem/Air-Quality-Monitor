@@ -4,47 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO: Title Tag -->
     <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
 
-    <!-- SEO: Meta Tags -->
     <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
     <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, ahmed salem, web developer, portfolio">
     <meta name="author" content="Ahmed Salem">
     <link rel="canonical" href="https://air-quality-monitor-3.netlify.app" /> <!-- Replace with your actual URL -->
 
-    <!-- SEO: Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
     <meta property="og:title" content="Air Quality Monitor - Live AQI & Pollution Map">
     <meta property="og:description" content="Track real-time air quality and pollution levels with our interactive map.">
     <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
 
-    <!-- SEO: Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
     <meta property="twitter:title" content="Air Quality Monitor - Live AQI & Pollution Map">
     <meta property="twitter:description" content="Track real-time air quality and pollution levels with our interactive map.">
     <meta property="twitter:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
 
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
     <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
 
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts for better language support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <!-- LeafletJS for maps (from Cloudflare CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 
 
-    <!-- Custom Styles -->
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
         #map-container { height: 100vh; width: 100vw; }
@@ -71,7 +62,6 @@
 </head>
 <body class="font-sans text-gray-800 bg-gray-50">
 
-    <!-- Landing Page Section -->
     <div id="landing-page">
         <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-20">
             <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -83,7 +73,6 @@
             </nav>
         </header>
 
-        <!-- Hero Section -->
         <section class="hero-bg text-white pt-32 pb-20 text-center">
             <div class="container mx-auto px-6">
                 <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Breathe Clearer. Live Better.</h2>
@@ -92,7 +81,6 @@
             </div>
         </section>
 
-        <!-- Features Section -->
         <section id="features" class="bg-white py-20">
             <div class="container mx-auto px-6 text-center">
                  <h3 class="text-3xl font-bold mb-2">Why Use Our Monitor?</h3>
@@ -117,7 +105,6 @@
             </div>
         </section>
 
-        <!-- Meet the Developer Section -->
         <section id="developer" class="bg-gray-800 text-white py-20">
             <div class="container mx-auto px-6">
                 <div class="md:flex items-center">
@@ -148,12 +135,10 @@
         </footer>
     </div>
 
-    <!-- Map & App Section (Initially Hidden) -->
     <div id="map-view" class="hidden">
         <div id="map-container" class="relative">
             <div id="map"></div>
 
-            <!-- Geolocation Button -->
             <button id="locate-btn" class="absolute bottom-4 left-4 z-[1000] bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Find my location">
                 <svg id="locate-icon" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor" class="text-gray-600">
                     <path d="M0 0h24v24H0V0z" fill="none"/>
@@ -214,7 +199,6 @@
             </div>
         </div>
         
-        <!-- Custom Notification Modal -->
         <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
                 <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
@@ -228,7 +212,6 @@
             </div>
         </div>
 
-        <!-- Geolocation Error Modal -->
         <div id="location-error-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
             <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
                 <h3 class="text-lg font-bold">Location Error</h3>
@@ -249,7 +232,6 @@
             let mapInitialized = false;
             let map = null; // Declare map variable here to be accessible in wider scope
 
-            // --- SPA Routing Logic ---
             function handleRouteChange() {
                 const isMapVisible = window.location.hash === '#map';
                 
@@ -274,13 +256,10 @@
                 }
             }
 
-            // Listen for hash changes (e.g., back/forward buttons)
             window.addEventListener('hashchange', handleRouteChange);
 
-            // Initial route check on page load
             handleRouteChange();
             
-            // Handle clicks on any link pointing to #map
             document.querySelectorAll('a[href="#map"]').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -289,13 +268,10 @@
             });
 
 
-            // --- Map Application Logic ---
             function initializeMapApp() {
-                // --- !! IMPORTANT !! ---
                 const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
                 const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
 
-                // --- UI Elements & State ---
                 const dataPanel = document.getElementById('data-panel');
                 const loadingDiv = document.getElementById('loading');
                 const dataContentDiv = document.getElementById('data-content');
@@ -322,7 +298,6 @@
                 let subscribedCities = [];
                 let marker;
 
-                // --- Initial Setup: Check for API Keys first ---
                 if (!WAQI_API_KEY || !OPENWEATHER_API_KEY) {
                     dataPanel.classList.remove('hidden');
                     handleError("API Key is missing. Please check the script and add your API keys.");
@@ -338,17 +313,14 @@
                     notifyBtn.textContent = "Not Supported";
                 }
                 
-                // --- Map Setup ---
                 map = L.map('map').setView([40, -95], 4); // Assign to the outer scope map variable
                  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
                 marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
 
-                // Get user location on initial map load
                 getUserLocation();
 
-                // --- Event Listeners ---
                 map.on('click', function(e) {
                     const { lat, lng } = e.latlng;
                     marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
@@ -370,7 +342,6 @@
                     requestBrowserPermission();
                 });
 
-                // --- Geolocation Functions ---
                 function getUserLocation() {
                     if (navigator.geolocation) {
                         locateIcon.classList.remove('text-gray-600');
@@ -423,7 +394,6 @@
                     marker.setPopupContent('Click anywhere on the map.');
                 }
 
-                // --- Core Data Functions ---
                 async function fetchAllDataForLocation(lat, lng) {
                     try {
                         const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
@@ -459,7 +429,6 @@
                     return await response.json();
                 }
 
-                // --- UI Update Functions ---
                 function updateUIPanel({ aqiData, weatherData }) {
                     let cityName = "Unknown Location";
                     if (aqiData) {
@@ -524,7 +493,6 @@
                     forecastTextEl.textContent = displayMessage;
                 }
                 
-                // --- Helper Functions ---
                 function generateForecast(aqiData, weatherData) {
                     const aqi = aqiData ? aqiData.aqi : null;
                     const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
@@ -559,7 +527,6 @@
                     });
                 }
 
-                // --- Notification Logic ---
                 function handleNotificationClick() {
                     const permission = Notification.permission;
                     if (permission === "granted") {
@@ -631,7 +598,7 @@
                         notifyBtn.classList.add('bg-blue-500');
                     }
                 }
-            } // End of initializeMapApp
+            } 
         });
     </script>
 </body>
