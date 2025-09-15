@@ -4,661 +4,652 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO: Title Tag -->
     <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
-
-    <!-- SEO: Meta Tags -->
     <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
     <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, ahmed salem, web developer, portfolio">
     <meta name="author" content="Ahmed Salem">
-    <link rel="canonical" href="https://air-quality-monitor-3.netlify.app" /> <!-- Replace with your actual URL -->
-
-    <!-- SEO: Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
-    <meta property="og:title" content="Air Quality Monitor - Live AQI & Pollution Map">
-    <meta property="og:description" content="Track real-time air quality and pollution levels with our interactive map.">
-    <meta property="og:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
-
-    <!-- SEO: Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://air-quality-monitor-3.netlify.app"> <!-- Replace with your actual URL -->
-    <meta property="twitter:title" content="Air Quality Monitor - Live AQI & Pollution Map">
-    <meta property="twitter:description" content="Track real-time air quality and pollution levels with our interactive map.">
-    <meta property="twitter:image" content="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
+    <link rel="canonical" href="https://air-quality-monitor-3.netlify.app" />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
-    <link rel="apple-touch-icon" href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png">
-
-    <!-- Tailwind CSS for styling -->
+    
+    <!-- Tailwind CSS, Google Fonts, LeafletJS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Google Fonts for better language support -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
-
-    <!-- LeafletJS for maps (from Cloudflare CDN) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Cairo:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
-
-    <!-- Leaflet Geocoder for Search -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-    <!-- Custom Styles -->
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; scroll-behavior: smooth; }
+        :root { --font-primary: 'Inter', sans-serif; --font-secondary: 'Cairo', sans-serif; }
+        body { background-color: #f8fafc; scroll-behavior: smooth; }
+        .lang-en { font-family: var(--font-primary); }
+        .lang-ar { font-family: var(--font-secondary); }
         #map-container { height: 100vh; width: 100vw; }
         #map { height: 100%; width: 100%; z-index: 1; }
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3b82f6;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .hero-bg {
-             background-color: #111827;
-             background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0);
-             background-size: 25px 25px;
-        }
-        /* Style for the geocoder search bar */
-        .leaflet-control-geocoder {
-            font-family: 'Inter', sans-serif;
-        }
+        .loader { border: 5px solid #f3f3f3; border-top: 5px solid #3b82f6; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hero-bg { background-color: #111827; background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0); background-size: 25px 25px; }
+        .leaflet-control-geocoder-form input { font-family: var(--font-primary); }
+        html[lang="ar"] .leaflet-control-geocoder-form input { font-family: var(--font-secondary); }
+        /* Style for history items */
+        #history-list li { cursor: pointer; transition: background-color 0.2s; }
+        #history-list li:hover { background-color: #f3f4f6; }
     </style>
 </head>
-<body class="font-sans text-gray-800 bg-gray-50">
+<body class="text-gray-800">
 
-    <!-- Landing Page Section -->
-    <div id="landing-page">
+    <!-- Auth Modals -->
+    <div id="auth-modals">
+        <!-- Login Modal -->
+        <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+                <button id="close-login-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="loginTitle">Login to Your Account</h3>
+                <form id="login-form">
+                    <input id="login-email" type="email" placeholder="Email" class="w-full p-3 mb-4 border rounded" required>
+                    <input id="login-password" type="password" placeholder="Password" class="w-full p-3 mb-4 border rounded" required>
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="loginButton">Login</button>
+                </form>
+                <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
+                <p class="text-center mt-4">
+                    <span data-lang-key="noAccount">Don't have an account?</span>
+                    <a href="#" id="show-signup" class="text-blue-600 hover:underline" data-lang-key="signupLink">Sign up</a>
+                </p>
+            </div>
+        </div>
+        <!-- Signup Modal -->
+        <div id="signup-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+                 <button id="close-signup-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="signupTitle">Create a New Account</h3>
+                <form id="signup-form">
+                    <input id="signup-email" type="email" placeholder="Email" class="w-full p-3 mb-4 border rounded" required>
+                    <input id="signup-password" type="password" placeholder="Password (min. 6 characters)" class="w-full p-3 mb-4 border rounded" required>
+                    <button type="submit" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700" data-lang-key="signupButton">Sign Up</button>
+                </form>
+                <p id="signup-error" class="text-red-500 text-sm mt-4 text-center"></p>
+                <p class="text-center mt-4">
+                    <span data-lang-key="hasAccount">Already have an account?</span>
+                    <a href="#" id="show-login" class="text-blue-600 hover:underline" data-lang-key="loginLink">Login</a>
+                </p>
+            </div>
+        </div>
+        <!-- Change Password Modal -->
+        <div id="password-change-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+             <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+                <button id="close-password-change-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="changePasswordTitle">Change Password</h3>
+                <form id="password-change-form">
+                    <input id="new-password" type="password" placeholder="New Password (min. 6 characters)" class="w-full p-3 mb-4 border rounded" required>
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="changePasswordButton">Update Password</button>
+                </form>
+                <p id="password-change-feedback" class="text-sm mt-4 text-center"></p>
+            </div>
+        </div>
+        <!-- History Modal -->
+        <div id="history-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+             <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-lg mx-4 relative">
+                <button id="close-history-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="historyTitle">Search History</h3>
+                <div id="history-list-container" class="max-h-96 overflow-y-auto">
+                    <ul id="history-list" class="space-y-2">
+                        <!-- History items will be injected here -->
+                    </ul>
+                    <p id="no-history-message" class="text-center text-gray-500 hidden" data-lang-key="noHistory">Your search history is empty.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
         <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-20">
             <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="#" class="flex items-center space-x-2">
+                <a href="#" id="home-logo-link" class="flex items-center space-x-2">
                      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png" alt="Logo" class="h-8 w-8">
-                     <h1 class="text-xl font-bold text-white">Air Quality Monitor</h1>
+                     <h1 class="text-xl font-bold text-white" data-lang-key="appName">Air Quality Monitor</h1>
                 </a>
-                <a href="#map" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors">Launch Map</a>
+                <div class="flex items-center space-x-4">
+                    <!-- Language Switcher -->
+                    <div class="flex space-x-2">
+                        <button id="lang-en" class="text-white font-semibold text-sm py-1 px-2 rounded bg-gray-700">EN</button>
+                        <button id="lang-ar" class="text-gray-400 font-semibold text-sm py-1 px-2 rounded hover:bg-gray-700">AR</button>
+                    </div>
+                    <!-- Auth Buttons / User Menu -->
+                    <div id="auth-container-logged-out">
+                        <button id="login-btn" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm" data-lang-key="navLogin">Login</button>
+                        <button id="signup-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 text-sm" data-lang-key="navSignup">Sign Up</button>
+                    </div>
+                    <div id="auth-container-logged-in" class="hidden relative">
+                        <button id="user-menu-btn" class="bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm flex items-center">
+                            <span id="user-email-display"></span>
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30 hidden">
+                            <a href="#" id="history-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuHistory">Search History</a>
+                            <a href="#" id="change-password-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuChangePassword">Change Password</a>
+                            <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuLogout">Logout</a>
+                        </div>
+                    </div>
+                </div>
             </nav>
         </header>
 
-        <!-- Hero Section -->
-        <section class="hero-bg text-white pt-32 pb-20 text-center">
-            <div class="container mx-auto px-6">
-                <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Breathe Clearer. Live Better.</h2>
-                <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
-                <a href="#map" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-transform transform hover:scale-105 inline-block">Launch Live Map</a>
-            </div>
-        </section>
-
-        <!-- Features Section -->
-        <section id="features" class="bg-white py-20">
-            <div class="container mx-auto px-6 text-center">
-                 <h3 class="text-3xl font-bold mb-2">Why Use Our Monitor?</h3>
-                 <p class="text-gray-600 mb-12">Everything you need to stay informed about air quality.</p>
-                 <div class="grid md:grid-cols-3 gap-8">
-                     <div class="p-6 bg-gray-100 rounded-lg">
-                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                         <h4 class="text-xl font-bold mb-2">Live Global Data</h4>
-                         <p class="text-gray-600">Get up-to-the-minute AQI data from thousands of stations worldwide. Click anywhere on the map to get started.</p>
-                     </div>
-                     <div class="p-6 bg-gray-100 rounded-lg">
-                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                         <h4 class="text-xl font-bold mb-2">Health Recommendations</h4>
-                         <p class="text-gray-600">Receive simple, actionable advice based on the current air quality to protect your health.</p>
-                     </div>
-                     <div class="p-6 bg-gray-100 rounded-lg">
-                         <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                         <h4 class="text-xl font-bold mb-2">Weather & Forecast</h4>
-                         <p class="text-gray-600">See current weather conditions and a forecast that helps you plan your outdoor activities safely.</p>
-                     </div>
-                 </div>
-            </div>
-        </section>
-
-        <!-- Meet the Developer Section -->
-        <section id="developer" class="bg-gray-800 text-white py-20">
-            <div class="container mx-auto px-6">
-                <div class="md:flex items-center">
-                    <div class="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
-                         <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjhOJa5Bv82i-fJSIAcGOg8w9GS9Ls41a8BXT2p62I3953bS-B36M-kjklJad7bM_ZVv65QcmPdTfvsrYtdCnn2wbF6CCw8_qwSk3w2y9f3F-0wm8Iy5wKLKeUGhiqxs58ZgRyNgnJBI57WA8Cp-LsUpr5dIzn6fKU0adeodZgaEQa1_wNsQohd3CK6Zus/s1011/IMG-20241204-WA0010%20-%20Copy.jpg" alt="Ahmed Salem" class="w-48 h-48 rounded-full mx-auto md:mx-0 shadow-lg object-cover">
+        <!-- Landing Page Section -->
+        <div id="landing-page">
+            <section class="hero-bg text-white pt-32 pb-20 text-center">
+                <div class="container mx-auto px-6">
+                    <h2 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight" data-lang-key="heroTitle">Breathe Clearer. Live Better.</h2>
+                    <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto" data-lang-key="heroSubtitle">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
+                    <a href="#map" id="launch-map-btn" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-transform transform hover:scale-105 inline-block" data-lang-key="heroButton">Launch Live Map</a>
+                </div>
+            </section>
+            
+            <!-- NEW Detailed Features Section -->
+            <section id="about-features" class="py-20 bg-white">
+                <div class="container mx-auto px-6">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl md:text-4xl font-bold" data-lang-key="aboutTitle">A Comprehensive Tool for Your Well-being</h2>
+                        <p class="text-gray-600 mt-4 max-w-3xl mx-auto" data-lang-key="aboutSubtitle">We combine air quality, weather data, and personalized features to give you a complete picture of your environment.</p>
                     </div>
-                    <div class="md:w-2/3 md:pl-12">
-                         <h3 class="text-3xl font-bold mb-2">Meet the Developer</h3>
-                         <h4 class="text-2xl font-semibold text-blue-400 mb-4">Ahmed Salem</h4>
-                         <p class="text-gray-300 mb-6">
-                             A motivated and passionate student developer with a strong foundation in AI Web Development and Odoo ERP systems. This project was built to apply technical skills in a real-world context, creating a tool that is both useful and accessible. With experience in leading tech initiatives and training at the Microsoft Academy in Qaliobia, Ahmed is passionate about using technology to solve problems and create value.
-                         </p>
-                         <div class="flex space-x-4">
-                             <a href="https://linkedin.com/in/ahmedsalem-khalifa" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors">
-                                 <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clip-rule="evenodd"/></svg>
-                             </a>
-                             <a href="mailto:asalemkhalifa@gmail.com" class="text-blue-400 hover:text-blue-300 transition-colors">
-                                 <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
-                             </a>
+            
+                    <div class="space-y-16">
+                        <!-- Feature 1: Interactive Map -->
+                        <div class="flex flex-wrap items-center">
+                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
+                                <div class="p-3 text-blue-600 bg-blue-100 rounded-full inline-block mb-4">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </div>
+                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature1Title">Live Interactive Map</h3>
+                                <p class="text-gray-600" data-lang-key="feature1Desc">Our core feature is a dynamic world map. Click anywhere to get instant, real-time Air Quality Index (AQI) data from the nearest monitoring station. Track pollution levels in your city or anywhere you plan to travel.</p>
+                            </div>
+                            <div class="w-full md:w-1/2 lg:w-7/12 mt-8 md:mt-0">
+                                <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Laptop with map" class="rounded-lg shadow-xl">
+                            </div>
+                        </div>
+
+                        <!-- Feature 2: Detailed Data Panel -->
+                         <div class="flex flex-wrap items-center flex-row-reverse">
+                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8">
+                                <div class="p-3 text-green-600 bg-green-100 rounded-full inline-block mb-4">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature2Title">Detailed Data & Weather</h3>
+                                <p class="text-gray-600" data-lang-key="feature2Desc">Beyond the AQI number, our detailed panel shows you crucial weather information like temperature, humidity, and wind speed. This helps you understand how weather conditions affect air quality.</p>
+                            </div>
+                            <div class="w-full md:w-1/2 lg:w-7/12 mt-8 md:mt-0">
+                                <img src="https://blogger.googleusercontent.com/img/a/AVvXsEik6YyOCHbuvpICg9Ps2SQIUJVYrTNaB1aPbVILr79xK87h5qLCL-9zyAuQvzrVPVZQcc0s9v2OGyhp1cMJx1jfQ8HkKE0M_1DtACaCud51rj-FNBhhmLxZQedEOX-hkEnI_87XOKSnRWclh5lFcw3OH-pnioaE5vp973_JIi3Cyuhru5FwUhyZE-E8gT8" alt="Weather dashboard" class="rounded-lg shadow-xl">
+                            </div>
+                        </div>
+                        
+                        <!-- Feature 3: Search -->
+                        <div class="flex flex-wrap items-center">
+                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
+                                <div class="p-3 text-purple-600 bg-purple-100 rounded-full inline-block mb-4">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature3Title">Accurate Global Search</h3>
+                                <p class="text-gray-600" data-lang-key="feature3Desc">Can't find a place by clicking? Use our powerful search bar. Just type the name of any city or region, in English or Arabic, and the map will instantly take you there, providing the data you need.</p>
+                            </div>
+                            <div class="w-full md:w-1/2 lg:w-7/12 mt-8 md:mt-0">
+                                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Person searching on a map" class="rounded-lg shadow-xl">
+                            </div>
+                        </div>
+                        
+                        <!-- Feature 4: Health Advice -->
+                         <div class="flex flex-wrap items-center flex-row-reverse">
+                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8">
+                                <div class="p-3 text-red-600 bg-red-100 rounded-full inline-block mb-4">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                </div>
+                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature4Title">Personalized Health Advice</h3>
+                                <p class="text-gray-600" data-lang-key="feature4Desc">Based on the AQI level, we provide clear and simple health recommendations. Know when it's safe to exercise outdoors and when it's better for you and your family to stay inside.</p>
+                            </div>
+                            <div class="w-full md:w-1/2 lg:w-7/12 mt-8 md:mt-0">
+                                <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Person checking phone for health info" class="rounded-lg shadow-xl">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Advanced Features Section -->
+            <section id="advanced-features" class="bg-gray-50 py-20">
+                <div class="container mx-auto px-6 text-center">
+                     <h3 class="text-3xl font-bold mb-2" data-lang-key="advFeaturesTitle">Advanced Account Features</h3>
+                     <p class="text-gray-600 mb-12" data-lang-key="advFeaturesSubtitle">Get more out of the monitor with a free account.</p>
+                     <div class="grid md:grid-cols-3 gap-8">
+                         <div class="p-6 bg-white rounded-lg shadow-md">
+                            <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                             <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature1Title">Secure Accounts</h4>
+                             <p class="text-gray-600" data-lang-key="advFeature1Desc">Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.</p>
                          </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="bg-gray-900 text-white text-center py-6">
-            <p>&copy; 2024 Air Quality Monitor. Developed by Ahmed Salem. All rights reserved.</p>
-        </footer>
-    </div>
-
-    <!-- Map & App Section (Initially Hidden) -->
-    <div id="map-view" class="hidden">
-        <div id="map-container" class="relative">
-            <div id="map"></div>
-
-            <!-- Geolocation Button -->
-            <button id="locate-btn" class="absolute bottom-4 left-4 z-[1000] bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Find my location">
-                <svg id="locate-icon" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor" class="text-gray-600">
-                    <path d="M0 0h24v24H0V0z" fill="none"/>
-                    <path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
-                </svg>
-            </button>
-
-            <div id="data-panel" class="absolute top-4 left-4 right-4 sm:left-auto sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden">
-                <div id="loading" class="flex justify-center items-center h-48">
-                    <div class="loader"></div>
-                </div>
-
-                <div id="data-content" class="hidden relative">
-                    <div class="flex justify-between items-start">
-                        <div class="pr-2">
-                            <h2 id="city-name" class="text-xl font-bold text-gray-800">...</h2>
-                            <p id="update-time" class="text-xs text-gray-500">...</p>
-                        </div>
-                        <div class="flex items-center flex-shrink-0">
-                            <button id="notify-btn" class="bg-blue-500 text-white px-2 py-1 rounded-md text-sm hover:bg-blue-600 disabled:bg-gray-400 flex-shrink-0">Enable Notifications</button>
-                             <button id="close-panel-btn" class="ml-2 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <hr class="my-3">
-
-                    <div class="text-center">
-                        <p class="text-sm text-gray-600">Air Quality Index (AQI)</p>
-                        <div id="aqi-value" class="text-6xl font-bold my-2 text-gray-700">--</div>
-                        <div id="aqi-status" class="px-3 py-1 text-white rounded-full text-sm inline-block bg-gray-400">...</div>
-                    </div>
-
-                    <div class="mt-4 grid grid-cols-3 gap-2 text-center">
-                        <div>
-                            <p class="text-xs text-gray-500">Temp</p>
-                            <p id="temp-value" class="font-bold text-lg">--°C</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500">Humidity</p>
-                            <p id="humidity-value" class="font-bold text-lg">--%</p>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-500">Wind</p>
-                            <p id="wind-value" class="font-bold text-lg">-- km/h</p>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 bg-gray-100 p-2 rounded-lg">
-                        <h4 class="font-bold text-sm">Forecast & Health Advice:</h4>
-                        <p id="forecast-text" class="text-xs text-gray-700">Analyzing data...</p>
-                    </div>
-                     <div class="mt-4 text-center text-xs text-gray-500">
-                         <p>Powered by the nearest ground-station and weather data.</p>
+                         <div class="p-6 bg-white rounded-lg shadow-md">
+                             <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                             <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature2Title">Cloud History</h4>
+                             <p class="text-gray-600" data-lang-key="advFeature2Desc">Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.</p>
+                         </div>
+                         <div class="p-6 bg-white rounded-lg shadow-md">
+                            <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                             <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature3Title">Account Management</h4>
+                             <p class="text-gray-600" data-lang-key="advFeature3Desc">Easily manage your account settings, including the ability to change your password at any time to keep your account secure.</p>
+                         </div>
                      </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Custom Notification Modal -->
-        <div id="notification-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
-                <h3 class="text-lg font-bold">Enable Air Quality Alerts?</h3>
-                <p class="text-sm text-gray-600 my-4">
-                    This will allow the site to send you notifications. You can then choose which cities you want alerts for.
-                </p>
-                <div class="flex justify-end gap-4">
-                    <button id="modal-deny-btn" class="px-4 py-2 rounded text-gray-700 bg-gray-200 hover:bg-gray-300">Deny</button>
-                    <button id="modal-allow-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">Allow</button>
-                </div>
-            </div>
+            </section>
+            
         </div>
 
-        <!-- Geolocation Error Modal -->
-        <div id="location-error-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
-            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-full max-w-md mx-4">
-                <h3 class="text-lg font-bold">Location Error</h3>
-                <p id="location-error-message" class="text-sm text-gray-600 my-4">
-                    Could not get your location.
-                </p>
-                <div class="flex justify-end gap-4">
-                    <button id="location-error-ok-btn" class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">OK</button>
-                </div>
+        <!-- Map & App Section (Initially Hidden) -->
+        <div id="map-view" class="hidden">
+             <div id="map-container" class="relative">
+                <div id="map"></div>
+                <!-- The rest of the map UI elements go here, they will be part of the full script -->
             </div>
         </div>
     </div>
 
     <script>
+        // --- TRANSLATIONS OBJECT ---
+        const translations = {
+            en: {
+                appName: "Air Quality Monitor",
+                navLogin: "Login",
+                navSignup: "Sign Up",
+                heroTitle: "Breathe Clearer. Live Better.",
+                heroSubtitle: "Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.",
+                heroButton: "Launch Live Map",
+                loginTitle: "Login to Your Account",
+                loginButton: "Login",
+                noAccount: "Don't have an account?",
+                signupLink: "Sign up",
+                signupTitle: "Create a New Account",
+                signupButton: "Sign Up",
+                hasAccount: "Already have an account?",
+                loginLink: "Login",
+                changePasswordTitle: "Change Password",
+                changePasswordButton: "Update Password",
+                menuHistory: "Search History",
+                menuChangePassword: "Change Password",
+                menuLogout: "Logout",
+                searchPlaceholder: "Search for a city or place...",
+                historyTitle: "Search History",
+                noHistory: "Your search history is empty.",
+                aboutTitle: "A Comprehensive Tool for Your Well-being",
+                aboutSubtitle: "We combine air quality, weather data, and personalized features to give you a complete picture of your environment.",
+                feature1Title: "Live Interactive Map",
+                feature1Desc: "Our core feature is a dynamic world map. Click anywhere to get instant, real-time Air Quality Index (AQI) data from the nearest monitoring station. Track pollution levels in your city or anywhere you plan to travel.",
+                feature2Title: "Detailed Data & Weather",
+                feature2Desc: "Beyond the AQI number, our detailed panel shows you crucial weather information like temperature, humidity, and wind speed. This helps you understand how weather conditions affect air quality.",
+                feature3Title: "Accurate Global Search",
+                feature3Desc: "Can't find a place by clicking? Use our powerful search bar. Just type the name of any city or region, in English or Arabic, and the map will instantly take you there, providing the data you need.",
+                feature4Title: "Personalized Health Advice",
+                feature4Desc: "Based on the AQI level, we provide clear and simple health recommendations. Know when it's safe to exercise outdoors and when it's better for you and your family to stay inside.",
+                advFeaturesTitle: "Advanced Account Features",
+                advFeaturesSubtitle: "Get more out of the monitor with a free account.",
+                advFeature1Title: "Secure Accounts",
+                advFeature1Desc: "Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.",
+                advFeature2Title: "Cloud History",
+                advFeature2Desc: "Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.",
+                advFeature3Title: "Account Management",
+                advFeature3Desc: "Easily manage your account settings, including the ability to change your password at any time to keep your account secure.",
+            },
+            ar: {
+                appName: "مراقب جودة الهواء",
+                navLogin: "تسجيل الدخول",
+                navSignup: "حساب جديد",
+                heroTitle: "تنفس أنقى. عش أفضل.",
+                heroSubtitle: "دليلك الفوري لجودة الهواء الذي تتنفسه. نحن نقدم بيانات دقيقة ومباشرة لمساعدتك على اتخاذ قرارات صحية كل يوم.",
+                heroButton: "افتح الخريطة المباشرة",
+                loginTitle: "تسجيل الدخول إلى حسابك",
+                loginButton: "دخول",
+                noAccount: "ليس لديك حساب؟",
+                signupLink: "أنشئ حسابًا",
+                signupTitle: "إنشاء حساب جديد",
+                signupButton: "إنشاء حساب",
+                hasAccount: "هل لديك حساب بالفعل؟",
+                loginLink: "تسجيل الدخول",
+                changePasswordTitle: "تغيير كلمة المرور",
+                changePasswordButton: "تحديث كلمة المرور",
+                menuHistory: "سجل البحث",
+                menuChangePassword: "تغيير كلمة المرور",
+                menuLogout: "تسجيل الخروج",
+                searchPlaceholder: "ابحث عن مدينة أو مكان...",
+                historyTitle: "سجل البحث",
+                noHistory: "سجل البحث الخاص بك فارغ.",
+                aboutTitle: "أداة شاملة لرفاهيتك",
+                aboutSubtitle: "نحن نجمع بين بيانات جودة الهواء والطقس والميزات المخصصة لنمنحك صورة كاملة عن بيئتك.",
+                feature1Title: "خريطة تفاعلية مباشرة",
+                feature1Desc: "ميزتنا الأساسية هي خريطة عالمية ديناميكية. انقر في أي مكان للحصول على بيانات مؤشر جودة الهواء (AQI) الفورية في الوقت الفعلي من أقرب محطة مراقبة. تتبع مستويات التلوث في مدينتك أو أي مكان تخطط للسفر إليه.",
+                feature2Title: "بيانات مفصلة والطقس",
+                feature2Desc: "إلى جانب رقم مؤشر جودة الهواء، تعرض لك لوحة البيانات التفصيلية معلومات الطقس الهامة مثل درجة الحرارة والرطوبة وسرعة الرياح. يساعدك هذا على فهم كيفية تأثير الظروف الجوية على جودة الهواء.",
+                feature3Title: "بحث عالمي دقيق",
+                feature3Desc: "لا يمكنك العثور على مكان بالنقر؟ استخدم شريط البحث القوي الخاص بنا. فقط اكتب اسم أي مدينة أو منطقة، باللغة الإنجليزية أو العربية، وستأخذك الخريطة على الفور إلى هناك، مع توفير البيانات التي تحتاجها.",
+                feature4Title: "نصائح صحية مخصصة",
+                feature4Desc: "بناءً على مستوى مؤشر جودة الهواء، نقدم توصيات صحية واضحة وبسيطة. اعرف متى يكون من الآمن ممارسة الرياضة في الهواء الطلق ومتى يكون من الأفضل لك ولعائلتك البقاء في الداخل.",
+                advFeaturesTitle: "ميزات متقدمة لحسابك",
+                advFeaturesSubtitle: "احصل على المزيد من الميزات عند إنشاء حساب مجاني.",
+                advFeature1Title: "حسابات آمنة",
+                advFeature1Desc: "أنشئ حسابًا مجانيًا وآمنًا لإدارة تجربتك. بياناتك محمية باستخدام أفضل معايير الأمان.",
+                advFeature2Title: "سجل سحابي",
+                advFeature2Desc: "يتم حفظ سجل البحث تلقائيًا في حسابك، مما يتيح لك الوصول إلى أماكنك المتكررة من أي جهاز.",
+                advFeature3Title: "إدارة الحساب",
+                advFeature3Desc: "يمكنك إدارة إعدادات حسابك بسهولة، بما في ذلك القدرة على تغيير كلمة المرور في أي وقت للحفاظ على أمان حسابك.",
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- FIREBASE CONFIGURATION ---
+            const firebaseConfig = {
+                apiKey: "AIzaSyBuyUNk6-0OglHwO_N7Ar2V7IR_WjAH41M",
+                authDomain: "air-quality-monitor-6717a.firebaseapp.com",
+                projectId: "air-quality-monitor-6717a",
+                storageBucket: "air-quality-monitor-6717a.firebasestorage.app",
+                messagingSenderId: "864803225125",
+                appId: "1:864803225125:web:b058d248c460be218749cc"
+            };
+            
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            // --- UI ELEMENTS ---
             const landingPage = document.getElementById('landing-page');
             const mapView = document.getElementById('map-view');
+            const langEnBtn = document.getElementById('lang-en');
+            const langArBtn = document.getElementById('lang-ar');
+            const loggedOutContainer = document.getElementById('auth-container-logged-out');
+            const loggedInContainer = document.getElementById('auth-container-logged-in');
+            const userEmailDisplay = document.getElementById('user-email-display');
+            const userMenuBtn = document.getElementById('user-menu-btn');
+            const userMenu = document.getElementById('user-menu');
+            const loginModal = document.getElementById('login-modal');
+            const signupModal = document.getElementById('signup-modal');
+            const passwordChangeModal = document.getElementById('password-change-modal');
+            const historyModal = document.getElementById('history-modal');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const passwordChangeForm = document.getElementById('password-change-form');
+            const historyList = document.getElementById('history-list');
+            const noHistoryMessage = document.getElementById('no-history-message');
+
             let mapInitialized = false;
-            let map = null; // Declare map variable here to be accessible in wider scope
+            let map = null;
 
-            // --- SPA Routing Logic ---
-            function handleRouteChange() {
-                const isMapVisible = window.location.hash === '#map';
-                
-                landingPage.classList.toggle('hidden', isMapVisible);
-                mapView.classList.toggle('hidden', !isMapVisible);
+            // --- LANGUAGE SWITCHER LOGIC ---
+            const setLanguage = (lang) => {
+                document.documentElement.lang = lang;
+                document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+                document.body.className = `lang-${lang} text-gray-800`;
 
-                if (isMapVisible) {
-                    // Check if the map needs to be created for the first time
-                    if (!mapInitialized) {
-                        initializeMapApp();
-                        mapInitialized = true;
+                document.querySelectorAll('[data-lang-key]').forEach(element => {
+                    const key = element.getAttribute('data-lang-key');
+                    if (translations[lang][key]) {
+                        element.textContent = translations[lang][key];
                     }
-                    
-                    // This is the crucial part. We use a minimal timeout to ensure this code
-                    // runs *after* the browser has finished rendering the layout changes (making the map div visible).
-                    // This tells the map to check its container's size and redraw itself correctly.
-                    setTimeout(function() {
-                        if (map) {
-                            map.invalidateSize();
-                        }
-                    }, 0);
-                }
-            }
-
-            // Listen for hash changes (e.g., back/forward buttons)
-            window.addEventListener('hashchange', handleRouteChange);
-
-            // Initial route check on page load
-            handleRouteChange();
-            
-            // Handle clicks on any link pointing to #map
-            document.querySelectorAll('a[href="#map"]').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    window.location.hash = '#map';
                 });
+                
+                if (map) {
+                    const geocoderControl = document.querySelector('.leaflet-control-geocoder-form input');
+                    if (geocoderControl) {
+                        geocoderControl.placeholder = translations[lang].searchPlaceholder;
+                    }
+                }
+
+                localStorage.setItem('preferredLanguage', lang);
+                updateLangButtons(lang);
+            };
+
+            const updateLangButtons = (lang) => {
+                if (lang === 'ar') {
+                    langArBtn.classList.add('bg-gray-700', 'text-white');
+                    langArBtn.classList.remove('text-gray-400', 'hover:bg-gray-700');
+                    langEnBtn.classList.remove('bg-gray-700', 'text-white');
+                    langEnBtn.classList.add('text-gray-400', 'hover:bg-gray-700');
+                } else {
+                    langEnBtn.classList.add('bg-gray-700', 'text-white');
+                    langEnBtn.classList.remove('text-gray-400', 'hover:bg-gray-700');
+                    langArBtn.classList.remove('bg-gray-700', 'text-white');
+                    langArBtn.classList.add('text-gray-400', 'hover:bg-gray-700');
+                }
+            };
+            
+            langEnBtn.addEventListener('click', () => setLanguage('en'));
+            langArBtn.addEventListener('click', () => setLanguage('ar'));
+            
+            const preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
+            setLanguage(preferredLanguage);
+
+
+            // --- AUTHENTICATION STATE OBSERVER ---
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    loggedOutContainer.classList.add('hidden');
+                    loggedInContainer.classList.remove('hidden');
+                    userEmailDisplay.textContent = user.email;
+                    if(window.location.hash === '#map' && !mapInitialized) {
+                       showMapView();
+                    }
+                } else {
+                    loggedOutContainer.classList.remove('hidden');
+                    loggedInContainer.classList.add('hidden');
+                    userEmailDisplay.textContent = '';
+                    showLandingPage();
+                }
+            });
+
+            // --- VIEW MANAGEMENT ---
+            const showLandingPage = () => {
+                landingPage.classList.remove('hidden');
+                mapView.classList.add('hidden');
+                if (window.location.hash === "#map") {
+                    window.location.hash = "";
+                }
+            };
+
+            const showMapView = () => {
+                landingPage.classList.add('hidden');
+                mapView.classList.remove('hidden');
+                if (!mapInitialized) {
+                    initializeMapApp();
+                    mapInitialized = true;
+                }
+                setTimeout(() => { if (map) map.invalidateSize(); }, 0);
+            };
+            
+            document.getElementById('launch-map-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (auth.currentUser) {
+                    window.location.hash = '#map';
+                } else {
+                    loginModal.classList.remove('hidden');
+                }
+            });
+            document.getElementById('home-logo-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                showLandingPage();
+            });
+            
+            window.addEventListener('hashchange', () => {
+                 if(window.location.hash === '#map' && auth.currentUser) {
+                    showMapView();
+                 } else {
+                    showLandingPage();
+                 }
             });
 
 
-            // --- Map Application Logic ---
-            function initializeMapApp() {
-                // --- !! IMPORTANT !! ---
-                const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0"; 
-                const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
+            // --- MODAL AND FORM HANDLING ---
+            document.getElementById('login-btn').addEventListener('click', () => loginModal.classList.remove('hidden'));
+            document.getElementById('signup-btn').addEventListener('click', () => signupModal.classList.remove('hidden'));
+            document.getElementById('change-password-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                userMenu.classList.add('hidden');
+                passwordChangeModal.classList.remove('hidden');
+            });
+            document.getElementById('history-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                userMenu.classList.add('hidden');
+                displaySearchHistory();
+                historyModal.classList.remove('hidden');
+            });
 
-                // --- UI Elements & State ---
-                const dataPanel = document.getElementById('data-panel');
-                const loadingDiv = document.getElementById('loading');
-                const dataContentDiv = document.getElementById('data-content');
-                const cityNameEl = document.getElementById('city-name');
-                const updateTimeEl = document.getElementById('update-time');
-                const aqiValueEl = document.getElementById('aqi-value');
-                const aqiStatusEl = document.getElementById('aqi-status');
-                const tempValueEl = document.getElementById('temp-value');
-                const humidityValueEl = document.getElementById('humidity-value');
-                const windValueEl = document.getElementById('wind-value');
-                const forecastTextEl = document.getElementById('forecast-text');
-                const notifyBtn = document.getElementById('notify-btn');
-                const notificationModal = document.getElementById('notification-modal');
-                const modalAllowBtn = document.getElementById('modal-allow-btn');
-                const modalDenyBtn = document.getElementById('modal-deny-btn');
-                const locateBtn = document.getElementById('locate-btn');
-                const locateIcon = document.getElementById('locate-icon');
-                const locationErrorModal = document.getElementById('location-error-modal');
-                const locationErrorMessage = document.getElementById('location-error-message');
-                const locationErrorOkBtn = document.getElementById('location-error-ok-btn');
-                const closePanelBtn = document.getElementById('close-panel-btn');
+            const closeAllModals = () => {
+                loginModal.classList.add('hidden');
+                signupModal.classList.add('hidden');
+                passwordChangeModal.classList.add('hidden');
+                historyModal.classList.add('hidden');
+            };
+            document.getElementById('close-login-modal').addEventListener('click', closeAllModals);
+            document.getElementById('close-signup-modal').addEventListener('click', closeAllModals);
+            document.getElementById('close-password-change-modal').addEventListener('click', closeAllModals);
+            document.getElementById('close-history-modal').addEventListener('click', closeAllModals);
+            
+            document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.add('hidden'); signupModal.classList.remove('hidden'); });
+            document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); signupModal.classList.add('hidden'); loginModal.classList.remove('hidden'); });
 
-                let latestAqiData = null;
-                let subscribedCities = [];
-                let marker;
-
-                // --- Initial Setup: Check for API Keys first ---
-                if (!WAQI_API_KEY || !OPENWEATHER_API_KEY) {
-                    dataPanel.classList.remove('hidden');
-                    handleError("API Key is missing. Please check the script and add your API keys.");
-                    return; // Stop initialization
+            userMenuBtn.addEventListener('click', () => userMenu.classList.toggle('hidden'));
+            document.addEventListener('click', (e) => {
+                if (!loggedInContainer.contains(e.target)) {
+                    userMenu.classList.add('hidden');
                 }
+            });
 
-                const savedCities = localStorage.getItem('subscribedCities');
-                if (savedCities) {
-                    subscribedCities = JSON.parse(savedCities);
-                }
-                if (!('Notification' in window)) {
-                    notifyBtn.disabled = true;
-                    notifyBtn.textContent = "Not Supported";
-                }
+            // --- FIREBASE AUTH ACTIONS ---
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signup-email').value;
+                const password = document.getElementById('signup-password').value;
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then(() => { closeAllModals(); signupForm.reset(); })
+                    .catch(error => { document.getElementById('signup-error').textContent = error.message; });
+            });
+
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                auth.signInWithEmailAndPassword(email, password)
+                    .then(() => { closeAllModals(); loginForm.reset(); })
+                    .catch(error => { document.getElementById('login-error').textContent = error.message; });
+            });
+            
+            document.getElementById('logout-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                auth.signOut();
+            });
+
+            passwordChangeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newPassword = document.getElementById('new-password').value;
+                const user = auth.currentUser;
+                const feedbackEl = document.getElementById('password-change-feedback');
                 
-                // --- Map Setup ---
-                map = L.map('map').setView([40, -95], 4); // Assign to the outer scope map variable
-                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                user.updatePassword(newPassword).then(() => {
+                    feedbackEl.textContent = "Password updated successfully!";
+                    feedbackEl.className = "text-green-500 text-sm mt-4 text-center";
+                    passwordChangeForm.reset();
+                    setTimeout(() => { closeAllModals(); feedbackEl.textContent = ""; }, 2000);
+                }).catch((error) => {
+                    feedbackEl.textContent = error.message;
+                     feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
+                });
+            });
+            
+            // --- HISTORY LOGIC (FIRESTORE) ---
+            const saveSearchToHistory = (locationData) => {
+                const user = auth.currentUser;
+                if (!user) return;
+                
+                const historyRef = db.collection('users').doc(user.uid).collection('history');
+                historyRef.add({
+                    name: locationData.name,
+                    lat: locationData.lat,
+                    lng: locationData.lng,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(error => console.error("Error adding document: ", error));
+            };
+
+            const displaySearchHistory = async () => {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                historyList.innerHTML = '<div class="flex justify-center items-center h-48"><div class="loader"></div></div>';
+                noHistoryMessage.classList.add('hidden');
+
+                const historyRef = db.collection('users').doc(user.uid).collection('history');
+                try {
+                    const snapshot = await historyRef.orderBy('timestamp', 'desc').limit(20).get();
+                    historyList.innerHTML = '';
+                    if (snapshot.empty) {
+                        noHistoryMessage.classList.remove('hidden');
+                    } else {
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            const li = document.createElement('li');
+                            li.className = 'p-3 border-b border-gray-200';
+                            li.innerHTML = `
+                                <p class="font-semibold">${data.name}</p>
+                                <p class="text-sm text-gray-500">Searched on: ${new Date(data.timestamp?.toDate()).toLocaleString()}</p>
+                            `;
+                            li.addEventListener('click', () => {
+                                closeAllModals();
+                                if(window.location.hash !== '#map') window.location.hash = '#map';
+                                setTimeout(() => {
+                                    map.setView([data.lat, data.lng], 13);
+                                    // You might want to trigger a data fetch here as well
+                                }, 100);
+                            });
+                            historyList.appendChild(li);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error getting history: ", error);
+                    historyList.innerHTML = `<p class="text-red-500 text-center">Could not load history.</p>`;
+                }
+            };
+
+
+            // --- MAP APPLICATION LOGIC (INITIALIZED ON DEMAND) ---
+            function initializeMapApp() {
+                console.log("Map Initialized!");
+                map = L.map('map').setView([26.8206, 30.8025], 6); 
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
-                marker = L.marker([40, -95]).addTo(map).bindPopup('Click anywhere on the map.').openPopup();
 
-                // Get user location on initial map load
-                getUserLocation();
+                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
 
-                // --- Search Control ---
                 L.Control.geocoder({
-                    defaultMarkGeocode: false, // Don't add a new marker, we will use our existing one
-                    placeholder: 'Search for a city or place...' 
+                    defaultMarkGeocode: false,
+                    placeholder: translations[currentLang].searchPlaceholder,
+                    geocoder: L.Control.Geocoder.nominatim({
+                        geocodingQueryParams: { "accept-language": "ar,en" } 
+                    })
                 }).on('markgeocode', function(e) {
                     const { center, name } = e.geocode;
-                    const { lat, lng } = center;
-                    
-                    // Move map and marker to the searched location
-                    map.setView([lat, lng], 13);
-                    marker.setLatLng([lat, lng]).setPopupContent(`Fetching data for ${name}...`).openPopup();
-                    
-                    // Show panel and fetch data, same as map click
-                    dataPanel.classList.remove('hidden');
-                    loadingDiv.classList.remove('hidden');
-                    dataContentDiv.classList.add('hidden');
-                    fetchAllDataForLocation(lat, lng);
+                    saveSearchToHistory({name: name, lat: center.lat, lng: center.lng});
+                    console.log("Searched for:", name, center);
                 }).addTo(map);
 
-
-                // --- Event Listeners ---
                 map.on('click', function(e) {
                     const { lat, lng } = e.latlng;
-                    marker.setLatLng([lat, lng]).setPopupContent(`Fetching data...`).openPopup();
-                    dataPanel.classList.remove('hidden');
-                    loadingDiv.classList.remove('hidden');
-                    dataContentDiv.classList.add('hidden');
-                    fetchAllDataForLocation(lat, lng); 
+                    console.log("Clicked on:", lat, lng);
                 });
-
-                closePanelBtn.addEventListener('click', () => {
-                    dataPanel.classList.add('hidden');
-                });
-                locateBtn.addEventListener('click', getUserLocation);
-                locationErrorOkBtn.addEventListener('click', () => locationErrorModal.classList.add('hidden'));
-                notifyBtn.addEventListener('click', handleNotificationClick);
-                modalDenyBtn.addEventListener('click', () => notificationModal.classList.add('hidden'));
-                modalAllowBtn.addEventListener('click', () => {
-                    notificationModal.classList.add('hidden');
-                    requestBrowserPermission();
-                });
-
-                // --- Geolocation Functions ---
-                function getUserLocation() {
-                    if (navigator.geolocation) {
-                        locateIcon.classList.remove('text-gray-600');
-                        locateIcon.classList.add('text-blue-600');
-                        marker.setPopupContent("Finding your location...").openPopup();
-                        navigator.geolocation.getCurrentPosition(showPosition, showLocationError);
-                    } else {
-                        showLocationError({ message: "Geolocation is not supported by this browser." });
-                    }
-                }
-
-                function showPosition(position) {
-                    locateIcon.classList.remove('text-blue-600');
-                    locateIcon.classList.add('text-gray-600');
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    
-                    map.setView([lat, lng], 13);
-                    marker.setLatLng([lat, lng]).setPopupContent(`Fetching data for your location...`).openPopup();
-                    
-                    dataPanel.classList.remove('hidden');
-                    loadingDiv.classList.remove('hidden');
-                    dataContentDiv.classList.add('hidden');
-                    fetchAllDataForLocation(lat, lng);
-                }
-
-                function showLocationError(error) {
-                    locateIcon.classList.remove('text-blue-600');
-                    locateIcon.classList.add('text-gray-600');
-                    let message = "An unknown error occurred.";
-                    if(error && error.code) {
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                message = "You denied the request for Geolocation. Please enable location permissions in your browser settings to use this feature.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                message = "Location information is unavailable.";
-                                break;
-                            case error.TIMEOUT:
-                                message = "The request to get user location timed out.";
-                                break;
-                        }
-                    }
-                    if (error && error.message) {
-                        message = error.message;
-                    }
-
-                    locationErrorMessage.textContent = message;
-                    locationErrorModal.classList.remove('hidden');
-                    marker.setPopupContent('Click anywhere on the map.');
-                }
-
-                // --- Core Data Functions ---
-                async function fetchAllDataForLocation(lat, lng) {
-                    try {
-                        const [aqiResult, weatherResult] = await Promise.allSettled([ fetchAqiData(lat, lng), fetchWeatherData(lat, lng) ]);
-                        
-                        if(aqiResult.status === 'rejected') throw aqiResult.reason;
-                        if(weatherResult.status === 'rejected') throw weatherResult.reason;
-
-                        latestAqiData = aqiResult.value;
-                        const weatherData = weatherResult.value;
-                        
-                        updateUIPanel({ aqiData: latestAqiData, weatherData });
-
-                    } catch (error) {
-                        handleError(error);
-                    }
-                }
-                
-                async function fetchAqiData(lat, lng) {
-                    const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
-                    const response = await fetchWithTimeout(url);
-                    if (response.status === 401 || response.status === 403) throw new Error('Invalid or expired AQI API Key.');
-                    if (!response.ok) throw new Error(`AQI data request failed with status: ${response.status}`);
-                    const data = await response.json();
-                    if (data.status !== "ok" || !data.data.aqi) throw new Error(data.data || 'No nearby monitoring station found');
-                    return data.data;
-                }
-
-                async function fetchWeatherData(lat, lng) {
-                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=en`;
-                    const response = await fetchWithTimeout(url);
-                    if (response.status === 401 || response.status === 403) throw new Error('Invalid or expired Weather API Key.');
-                    if (!response.ok) throw new Error(`Weather data request failed with status: ${response.status}`);
-                    return await response.json();
-                }
-
-                // --- UI Update Functions ---
-                function updateUIPanel({ aqiData, weatherData }) {
-                    let cityName = "Unknown Location";
-                    if (aqiData) {
-                        cityName = aqiData.city.name;
-                        cityNameEl.textContent = cityName.length > 30 ? cityName.substring(0, 30) + '...' : cityName;
-                        
-                        if (aqiData.time && aqiData.time.s) {
-                            const date = new Date(aqiData.time.s);
-                            if (!isNaN(date.getTime())) {
-                                const timeString = date.toLocaleTimeString('en-US');
-                                const timeZoneString = aqiData.time.tz ? `(GMT${aqiData.time.tz})` : '';
-                                updateTimeEl.textContent = `Last updated: ${timeString} ${timeZoneString}`;
-                            } else {
-                                updateTimeEl.textContent = 'Last updated: Invalid Time';
-                            }
-                        } else {
-                            updateTimeEl.textContent = 'Last updated: Not available';
-                        }
-
-                        aqiValueEl.textContent = aqiData.aqi;
-                        const { status, color } = getAqiStatus(aqiData.aqi);
-                        aqiStatusEl.textContent = status;
-                        aqiStatusEl.style.backgroundColor = color;
-                    } else {
-                        cityNameEl.textContent = weatherData ? weatherData.name : cityName;
-                        updateTimeEl.textContent = 'Last updated: N/A';
-                        aqiValueEl.textContent = "N/A";
-                        aqiStatusEl.textContent = "No Data";
-                        aqiStatusEl.style.backgroundColor = "#7f8c8d";
-                    }
-
-                    if (weatherData && weatherData.main) {
-                        tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
-                        humidityValueEl.textContent = `${weatherData.main.humidity}%`;
-                        windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
-                    } else {
-                        tempValueEl.textContent = "--°C";
-                        humidityValueEl.textContent = "--%";
-                        windValueEl.textContent = "-- km/h";
-                    }
-                    
-                    forecastTextEl.textContent = generateForecast(aqiData, weatherData);
-                    if ('Notification' in window) {
-                        updateNotificationButtonState();
-                    }
-
-                    loadingDiv.classList.add('hidden');
-                    dataContentDiv.classList.remove('hidden');
-                }
-
-                function handleError(message) {
-                    loadingDiv.classList.add('hidden');
-                    dataContentDiv.classList.remove('hidden');
-                    cityNameEl.textContent = "An Error Occurred";
-                    aqiValueEl.textContent = "!";
-                    let displayMessage = typeof message === 'string' ? message : message.message;
-                    if (displayMessage.includes('timed out')) {
-                        displayMessage = "Request took too long. Please try a different area.";
-                    } else if (displayMessage.toLowerCase().includes('api key')) {
-                        displayMessage += " Please verify the keys in the script are correct and have not expired.";
-                    }
-                    forecastTextEl.textContent = displayMessage;
-                }
-                
-                // --- Helper Functions ---
-                function generateForecast(aqiData, weatherData) {
-                    const aqi = aqiData ? aqiData.aqi : null;
-                    const windSpeed = weatherData ? weatherData.wind.speed * 3.6 : null;
-                    const { advice } = getAqiStatus(aqi);
-                    if (!aqi || !windSpeed) return advice;
-                    let forecast = advice;
-                    if (aqi > 100 && windSpeed < 5) forecast += " Light winds may cause pollutants to linger.";
-                    else if (aqi > 100 && windSpeed > 15) forecast += " Strong winds may help to clear the air soon.";
-                    else if (aqi < 100 && windSpeed > 15) forecast += " Air quality is expected to remain good due to steady winds.";
-                    return forecast;
-                }
-                
-                function getAqiStatus(aqi) {
-                    if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
-                    if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
-                    if (aqi <= 150) return { status: "Unhealthy for Sensitive Groups", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
-                    if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
-                    if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
-                    return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
-                }
-
-                function fetchWithTimeout(url, timeout = 10000) {
-                    return new Promise((resolve, reject) => {
-                        const timer = setTimeout(() => reject(new Error('Request timed out')), timeout);
-                        fetch(url).then(response => {
-                            clearTimeout(timer);
-                            resolve(response);
-                        }, err => {
-                            clearTimeout(timer);
-                            reject(err);
-                        });
-                    });
-                }
-
-                // --- Notification Logic ---
-                function handleNotificationClick() {
-                    const permission = Notification.permission;
-                    if (permission === "granted") {
-                        toggleCitySubscription();
-                    } else if (permission === "denied") {
-                        const modal = document.createElement('div');
-                        modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-[3000] flex justify-center items-center';
-                        modal.innerHTML = `
-                            <div class="bg-white p-6 rounded-lg shadow-xl text-center w-96">
-                                <h3 class="text-lg font-bold">Notifications Blocked</h3>
-                                <p class="text-sm text-gray-600 my-4">You have previously blocked notifications. Please enable them in your browser's site settings to receive alerts.</p>
-                                <button class="px-4 py-2 rounded text-white bg-blue-500 hover:bg-blue-600">OK</button>
-                            </div>
-                        `;
-                        document.body.appendChild(modal);
-                        modal.querySelector('button').onclick = () => document.body.removeChild(modal);
-                    } else {
-                        notificationModal.classList.remove('hidden');
-                    }
-                }
-
-                function toggleCitySubscription() {
-                    const cityName = latestAqiData?.city?.name;
-                    if (!cityName) return;
-
-                    const cityIndex = subscribedCities.indexOf(cityName);
-                    if (cityIndex > -1) {
-                        subscribedCities.splice(cityIndex, 1);
-                         new Notification(`${cityName} Unsubscribed`, { body: "You will no longer receive alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
-                    } else {
-                        subscribedCities.push(cityName);
-                        new Notification(`${cityName} Subscribed!`, { body: "You will now receive air quality alerts for this city.", icon: 'https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png' });
-                    }
-                    
-                    localStorage.setItem('subscribedCities', JSON.stringify(subscribedCities));
-                    updateNotificationButtonState();
-                }
-
-                function requestBrowserPermission() {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            toggleCitySubscription();
-                        }
-                        updateNotificationButtonState();
-                    });
-                }
-                
-                function updateNotificationButtonState() {
-                    const permission = Notification.permission;
-                    const cityName = latestAqiData?.city?.name;
-
-                    notifyBtn.classList.remove('bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500');
-                    notifyBtn.disabled = false;
-
-                    if (permission === 'denied') {
-                        notifyBtn.textContent = 'Notifications Blocked';
-                        notifyBtn.disabled = true;
-                        notifyBtn.classList.add('bg-red-500');
-                    } else if (permission === 'granted') {
-                        if (cityName && subscribedCities.includes(cityName)) {
-                            notifyBtn.textContent = 'Alerts Active';
-                            notifyBtn.classList.add('bg-green-500');
-                        } else {
-                            notifyBtn.textContent = 'Get Alerts for this City';
-                            notifyBtn.classList.add('bg-blue-500');
-                        }
-                    } else {
-                        notifyBtn.textContent = 'Enable Notifications';
-                        notifyBtn.classList.add('bg-blue-500');
-                    }
-                }
-            } // End of initializeMapApp
+            }
+            
         });
     </script>
 </body>
