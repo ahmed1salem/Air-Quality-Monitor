@@ -35,7 +35,7 @@
         .hero-bg { background-color: #111827; background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0); background-size: 25px 25px; }
         .leaflet-control-geocoder-form input { font-family: var(--font-primary); }
         html[lang="ar"] .leaflet-control-geocoder-form input { font-family: var(--font-secondary); }
-        #history-list li { cursor: pointer; transition: background-color 0.2s; }
+        #history-list li { cursor: pointer; transition: background-color: 0.2s; }
         #history-list li:hover { background-color: #f3f4f6; }
         
         .leaflet-control-container .leaflet-top {
@@ -53,8 +53,8 @@
                 <button id="close-login-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
                 <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="loginTitle">Login to Your Account</h3>
                 <form id="login-form">
-                    <input id="login-email" type="email" class="w-full p-3 mb-4 border rounded" required data-lang-key="emailPlaceholder">
-                    <input id="login-password" type="password" class="w-full p-3 mb-4 border rounded" required data-lang-key="passwordPlaceholder">
+                    <input id="login-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
+                    <input id="login-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="Password" data-lang-key="passwordPlaceholder">
                     <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="loginButton">Login</button>
                 </form>
                 <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
@@ -70,8 +70,8 @@
                  <button id="close-signup-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
                 <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="signupTitle">Create a New Account</h3>
                 <form id="signup-form">
-                    <input id="signup-email" type="email" class="w-full p-3 mb-4 border rounded" required data-lang-key="emailPlaceholder">
-                    <input id="signup-password" type="password" class="w-full p-3 mb-4 border rounded" required data-lang-key="newPasswordPlaceholder">
+                    <input id="signup-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
+                    <input id="signup-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="New Password (min. 6 characters)" data-lang-key="newPasswordPlaceholder">
                     <button type="submit" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700" data-lang-key="signupButton">Sign Up</button>
                 </form>
                 <p id="signup-error" class="text-red-500 text-sm mt-4 text-center"></p>
@@ -87,8 +87,8 @@
                 <button id="close-password-change-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
                 <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="changePasswordTitle">Change Password</h3>
                 <form id="password-change-form">
-                    <input id="current-password" type="password" class="w-full p-3 mb-4 border rounded" required data-lang-key="currentPasswordPlaceholder" autocomplete="current-password">
-                    <input id="new-password" type="password" class="w-full p-3 mb-4 border rounded" required data-lang-key="newPasswordPlaceholder" autocomplete="new-password">
+                    <input id="current-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="Current Password" data-lang-key="currentPasswordPlaceholder" autocomplete="current-password">
+                    <input id="new-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="New Password (min. 6 characters)" data-lang-key="newPasswordPlaceholder" autocomplete="new-password">
                     <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="changePasswordButton">Update Password</button>
                 </form>
                 <p id="password-change-feedback" class="text-sm mt-4 text-center"></p>
@@ -437,7 +437,8 @@
                     const key = element.getAttribute('data-lang-key');
                     const translation = translations[lang][key];
                     if (translation) {
-                        if (element.hasAttribute('placeholder')) {
+                        // FIX: Check if element is an input-like element to set placeholder
+                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                             element.setAttribute('placeholder', translation);
                         } else {
                             element.textContent = translation;
@@ -555,7 +556,7 @@
                 signupModal.classList.add('hidden');
                 passwordChangeModal.classList.add('hidden');
                 historyModal.classList.add('hidden');
-                // Clear any previous feedback messages
+                // FIX: Clear any previous feedback messages
                 const feedbackElements = document.querySelectorAll('#login-error, #signup-error, #password-change-feedback');
                 feedbackElements.forEach(el => el.textContent = '');
             };
@@ -854,7 +855,8 @@
                      fetchAllDataForLocation(e.latlng.lat, e.latlng.lng);
                  });
                  map.on('locationerror', function(e) {
-                     alert(e.message);
+                     // FIX: Changed alert to console.error to avoid blocking UI
+                     console.error("Location Error: ", e.message);
                  });
             }
             
