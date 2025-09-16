@@ -35,7 +35,7 @@
         .hero-bg { background-color: #111827; background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0); background-size: 25px 25px; }
         .leaflet-control-geocoder-form input { font-family: var(--font-primary); }
         html[lang="ar"] .leaflet-control-geocoder-form input { font-family: var(--font-secondary); }
-        #history-list li { cursor: pointer; transition: background-color 0.2s; }
+        #history-list li { cursor: pointer; transition: background-color: 0.2s; }
         #history-list li:hover { background-color: #f3f4f6; }
         
         .leaflet-control-container .leaflet-top {
@@ -79,6 +79,7 @@
                  <button id="close-signup-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
                 <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="signupTitle">Create a New Account</h3>
                 <form id="signup-form">
+                    <input id="signup-name" type="text" class="w-full p-3 mb-4 border rounded" required placeholder="Full Name" data-lang-key="namePlaceholder">
                     <input id="signup-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
                     <input id="signup-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="New Password (min. 6 characters)" data-lang-key="newPasswordPlaceholder">
                     <button type="submit" class="w-full bg-green-600 text-white p-3 rounded font-bold hover:bg-green-700" data-lang-key="signupButton">Sign Up</button>
@@ -114,6 +115,22 @@
                     <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="changePasswordButton">Update Password</button>
                 </form>
                 <p id="password-change-feedback" class="text-sm mt-4 text-center"></p>
+            </div>
+        </div>
+        <!-- Edit Profile Modal -->
+        <div id="edit-profile-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+             <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+                <button id="close-edit-profile-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="editProfileTitle">Edit Profile</h3>
+                <form id="edit-profile-form">
+                    <input id="edit-name" type="text" class="w-full p-3 mb-4 border rounded" required placeholder="Full Name" data-lang-key="namePlaceholder">
+                    <hr class="my-4">
+                    <p class="text-sm text-gray-500 mb-2" data-lang-key="editEmailInstructions">To change your email, please enter your current password.</p>
+                    <input id="edit-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
+                    <input id="edit-password-verify" type="password" class="w-full p-3 mb-4 border rounded" placeholder="Current Password for verification" data-lang-key="currentPasswordPlaceholder">
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="saveChangesButton">Save Changes</button>
+                </form>
+                <p id="edit-profile-feedback" class="text-sm mt-4 text-center"></p>
             </div>
         </div>
         <!-- History Modal -->
@@ -153,10 +170,11 @@
                     </div>
                     <div id="auth-container-logged-in" class="hidden relative">
                         <button id="user-menu-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm flex items-center">
-                            <span id="user-email-display" class="truncate max-w-[100px] sm:max-w-xs"></span>
+                            <span id="user-name-display" class="truncate max-w-[100px] sm:max-w-xs"></span>
                             <svg class="w-4 h-4 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30 hidden">
+                            <a href="#" id="edit-profile-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuEditProfile">Edit Profile</a>
                             <a href="#" id="history-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuHistory">Search History</a>
                             <a href="#" id="change-password-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuChangePassword">Change Password</a>
                             <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuLogout">Logout</a>
@@ -296,7 +314,9 @@
             updatePassword,
             EmailAuthProvider,
             reauthenticateWithCredential,
-            sendPasswordResetEmail
+            sendPasswordResetEmail,
+            updateProfile,
+            updateEmail
         } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -318,6 +338,7 @@
                 heroTitle: "Breathe Clearer. Live Better.",
                 heroSubtitle: "Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.",
                 heroButton: "Launch Live Map",
+                namePlaceholder: "Full Name",
                 emailPlaceholder: "Email",
                 passwordPlaceholder: "Password",
                 loginTitle: "Login to Your Account",
@@ -334,11 +355,16 @@
                 sendResetLinkButton: "Send Reset Link",
                 resetEmailSent: "Password reset email sent! Please check your inbox.",
                 changePasswordTitle: "Change Password",
-                currentPasswordPlaceholder: "Current Password",
+                currentPasswordPlaceholder: "Current Password for verification",
                 newPasswordPlaceholder: "New Password (min. 6 characters)",
                 changePasswordButton: "Update Password",
                 passwordUpdateSuccess: "Password updated successfully!",
                 passwordUpdateError: "Incorrect current password. Please try again.",
+                menuEditProfile: "Edit Profile",
+                editProfileTitle: "Edit Profile",
+                editEmailInstructions: "To change your email, please enter your current password.",
+                saveChangesButton: "Save Changes",
+                profileUpdateSuccess: "Profile updated successfully!",
                 menuHistory: "Search History",
                 menuChangePassword: "Change Password",
                 menuLogout: "Logout",
@@ -371,6 +397,7 @@
                 heroTitle: "تنفس أنقى. عش أفضل.",
                 heroSubtitle: "دليلك الفوري لجودة الهواء الذي تتنفسه. نحن نقدم بيانات دقيقة ومباشرة لمساعدتك على اتخاذ قرارات صحية كل يوم.",
                 heroButton: "افتح الخريطة المباشرة",
+                namePlaceholder: "الاسم الكامل",
                 emailPlaceholder: "البريد الإلكتروني",
                 passwordPlaceholder: "كلمة المرور",
                 loginTitle: "تسجيل الدخول إلى حسابك",
@@ -387,11 +414,16 @@
                 sendResetLinkButton: "أرسل رابط الاستعادة",
                 resetEmailSent: "تم إرسال بريد إعادة تعيين كلمة المرور! يرجى التحقق من بريدك الوارد.",
                 changePasswordTitle: "تغيير كلمة المرور",
-                currentPasswordPlaceholder: "كلمة المرور الحالية",
+                currentPasswordPlaceholder: "كلمة المرور الحالية للتحقق",
                 newPasswordPlaceholder: "كلمة المرور الجديدة (6 أحرف على الأقل)",
                 changePasswordButton: "تحديث كلمة المرور",
                 passwordUpdateSuccess: "تم تحديث كلمة المرور بنجاح!",
                 passwordUpdateError: "كلمة المرور الحالية غير صحيحة. يرجى المحاولة مرة أخرى.",
+                menuEditProfile: "تعديل الملف الشخصي",
+                editProfileTitle: "تعديل الملف الشخصي",
+                editEmailInstructions: "لتغيير بريدك الإلكتروني، يرجى إدخال كلمة المرور الحالية.",
+                saveChangesButton: "حفظ التغييرات",
+                profileUpdateSuccess: "تم تحديث الملف الشخصي بنجاح!",
                 menuHistory: "سجل البحث",
                 menuChangePassword: "تغيير كلمة المرور",
                 menuLogout: "تسجيل الخروج",
@@ -446,18 +478,20 @@
             const langArBtn = document.getElementById('lang-ar');
             const loggedOutContainer = document.getElementById('auth-container-logged-out');
             const loggedInContainer = document.getElementById('auth-container-logged-in');
-            const userEmailDisplay = document.getElementById('user-email-display');
+            const userNameDisplay = document.getElementById('user-name-display');
             const userMenuBtn = document.getElementById('user-menu-btn');
             const userMenu = document.getElementById('user-menu');
             const loginModal = document.getElementById('login-modal');
             const signupModal = document.getElementById('signup-modal');
             const passwordChangeModal = document.getElementById('password-change-modal');
             const forgotPasswordModal = document.getElementById('forgot-password-modal');
+            const editProfileModal = document.getElementById('edit-profile-modal');
             const historyModal = document.getElementById('history-modal');
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
             const passwordChangeForm = document.getElementById('password-change-form');
             const forgotPasswordForm = document.getElementById('forgot-password-form');
+            const editProfileForm = document.getElementById('edit-profile-form');
             const historyList = document.getElementById('history-list');
             const noHistoryMessage = document.getElementById('no-history-message');
 
@@ -474,7 +508,6 @@
                     const key = element.getAttribute('data-lang-key');
                     const translation = translations[lang][key];
                     if (translation) {
-                        // FIX: Check if element is an input-like element to set placeholder
                         if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                             element.setAttribute('placeholder', translation);
                         } else {
@@ -520,14 +553,14 @@
                 if (user) {
                     loggedOutContainer.classList.add('hidden');
                     loggedInContainer.classList.remove('hidden');
-                    userEmailDisplay.textContent = user.email;
+                    userNameDisplay.textContent = user.displayName || user.email;
                     if(window.location.hash === '#map' && !mapInitialized) {
                        showMapView();
                     }
                 } else {
                     loggedOutContainer.classList.remove('hidden');
                     loggedInContainer.classList.add('hidden');
-                    userEmailDisplay.textContent = '';
+                    userNameDisplay.textContent = '';
                     showLandingPage();
                 }
             });
@@ -586,6 +619,16 @@
                 loginModal.classList.add('hidden');
                 forgotPasswordModal.classList.remove('hidden');
             });
+            document.getElementById('edit-profile-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                const user = auth.currentUser;
+                if (user) {
+                    document.getElementById('edit-name').value = user.displayName || '';
+                    document.getElementById('edit-email').value = user.email || '';
+                }
+                userMenu.classList.add('hidden');
+                editProfileModal.classList.remove('hidden');
+            });
             document.getElementById('history-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 userMenu.classList.add('hidden');
@@ -595,8 +638,7 @@
 
             const closeAllModals = () => {
                 document.querySelectorAll('#auth-modals > div').forEach(modal => modal.classList.add('hidden'));
-                // FIX: Clear any previous feedback messages
-                const feedbackElements = document.querySelectorAll('#login-error, #signup-error, #password-change-feedback, #forgot-password-feedback');
+                const feedbackElements = document.querySelectorAll('#login-error, #signup-error, #password-change-feedback, #forgot-password-feedback, #edit-profile-feedback');
                 feedbackElements.forEach(el => el.textContent = '');
             };
 
@@ -604,6 +646,7 @@
             document.getElementById('close-signup-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-password-change-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-forgot-password-modal').addEventListener('click', closeAllModals);
+            document.getElementById('close-edit-profile-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-history-modal').addEventListener('click', closeAllModals);
             
             document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.add('hidden'); signupModal.classList.remove('hidden'); });
@@ -619,10 +662,18 @@
             // --- FIREBASE AUTH ACTIONS ---
             signupForm.addEventListener('submit', (e) => {
                 e.preventDefault();
+                const name = document.getElementById('signup-name').value;
                 const email = document.getElementById('signup-email').value;
                 const password = document.getElementById('signup-password').value;
+                
                 createUserWithEmailAndPassword(auth, email, password)
-                    .then(() => { closeAllModals(); signupForm.reset(); })
+                    .then((userCredential) => {
+                        return updateProfile(userCredential.user, { displayName: name });
+                    })
+                    .then(() => {
+                        closeAllModals();
+                        signupForm.reset();
+                    })
                     .catch(error => { document.getElementById('signup-error').textContent = error.message; });
             });
 
@@ -687,6 +738,59 @@
                         feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
                     });
             });
+
+            editProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newName = document.getElementById('edit-name').value;
+                const newEmail = document.getElementById('edit-email').value;
+                const password = document.getElementById('edit-password-verify').value;
+                const user = auth.currentUser;
+                const feedbackEl = document.getElementById('edit-profile-feedback');
+                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+
+                if (!user) return;
+
+                let promises = [];
+                let nameChanged = newName !== user.displayName;
+                let emailChanged = newEmail !== user.email;
+
+                if (nameChanged) {
+                    promises.push(updateProfile(user, { displayName: newName }));
+                }
+
+                if (emailChanged) {
+                    if (!password) {
+                        feedbackEl.textContent = "Password is required to change email.";
+                        feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
+                        return;
+                    }
+                    const credential = EmailAuthProvider.credential(user.email, password);
+                    const reauthPromise = reauthenticateWithCredential(user, credential)
+                        .then(() => updateEmail(user, newEmail));
+                    promises.push(reauthPromise);
+                }
+
+                if (promises.length === 0) {
+                    closeAllModals();
+                    return;
+                }
+                
+                try {
+                    await Promise.all(promises);
+                    feedbackEl.textContent = translations[currentLang].profileUpdateSuccess;
+                    feedbackEl.className = "text-green-500 text-sm mt-4 text-center";
+                    if (nameChanged) userNameDisplay.textContent = newName;
+                    setTimeout(() => { closeAllModals(); }, 2000);
+                } catch (error) {
+                     if (error.code === 'auth/wrong-password') {
+                        feedbackEl.textContent = translations[currentLang].passwordUpdateError;
+                    } else {
+                        feedbackEl.textContent = error.message;
+                    }
+                    feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
+                }
+            });
+
 
             // --- HISTORY LOGIC (FIRESTORE) ---
             const saveSearchToHistory = (locationData) => {
@@ -911,7 +1015,6 @@
                      fetchAllDataForLocation(e.latlng.lat, e.latlng.lng);
                  });
                  map.on('locationerror', function(e) {
-                     // FIX: Changed alert to console.error to avoid blocking UI
                      console.error("Location Error: ", e.message);
                  });
             }
@@ -920,3 +1023,4 @@
     </script>
 </body>
 </html>
+
