@@ -4,6 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Content Security Policy (CSP) for enhanced security -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com https://www.gstatic.com; 
+                   style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com; 
+                   font-src 'self' https://fonts.gstatic.com; 
+                   img-src 'self' https: data:;
+                   connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://api.waqi.info https://api.openweathermap.org https://www.google-analytics.com https://firebaseinstallations.googleapis.com;">
+
     <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
     <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
     <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, ahmed salem, web developer, portfolio">
@@ -35,7 +44,7 @@
         .hero-bg { background-color: #111827; background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0); background-size: 25px 25px; }
         .leaflet-control-geocoder-form input { font-family: var(--font-primary); }
         html[lang="ar"] .leaflet-control-geocoder-form input { font-family: var(--font-secondary); }
-        #history-list li { cursor: pointer; transition: background-color 0.2s; }
+        #history-list li { cursor: pointer; transition: background-color: 0.2s; }
         #history-list li:hover { background-color: #f3f4f6; }
         
         .leaflet-control-container .leaflet-top {
@@ -511,6 +520,13 @@
 
             let mapInitialized = false;
             let map = null;
+            
+            // --- SECURITY HELPER ---
+            const sanitizeInput = (input) => {
+                const div = document.createElement('div');
+                div.textContent = input;
+                return div.innerHTML;
+            };
 
             // --- LANGUAGE SWITCHER LOGIC ---
             const setLanguage = (lang) => {
@@ -680,9 +696,16 @@
                 const email = document.getElementById('signup-email').value;
                 const password = document.getElementById('signup-password').value;
                 
+                // Sanitize name input to prevent XSS
+                const sanitizedName = sanitizeInput(name);
+                if (name !== sanitizedName) {
+                    document.getElementById('signup-error').textContent = "Invalid characters in name.";
+                    return;
+                }
+
                 createUserWithEmailAndPassword(auth, email, password)
                     .then((userCredential) => {
-                        return updateProfile(userCredential.user, { displayName: name });
+                        return updateProfile(userCredential.user, { displayName: sanitizedName });
                     })
                     .then(() => {
                         closeAllModals();
@@ -761,15 +784,23 @@
                 const user = auth.currentUser;
                 const feedbackEl = document.getElementById('edit-profile-feedback');
                 const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+                
+                const sanitizedName = sanitizeInput(newName);
+                if (newName !== sanitizedName) {
+                    feedbackEl.textContent = "Invalid characters in name.";
+                    feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
+                    return;
+                }
+
 
                 if (!user) return;
 
                 let promises = [];
-                let nameChanged = newName !== user.displayName;
+                let nameChanged = sanitizedName !== user.displayName;
                 let emailChanged = newEmail !== user.email;
 
                 if (nameChanged) {
-                    promises.push(updateProfile(user, { displayName: newName }));
+                    promises.push(updateProfile(user, { displayName: sanitizedName }));
                 }
 
                 if (emailChanged) {
@@ -793,7 +824,7 @@
                     await Promise.all(promises);
                     feedbackEl.textContent = translations[currentLang].profileUpdateSuccess;
                     feedbackEl.className = "text-green-500 text-sm mt-4 text-center";
-                    if (nameChanged) userNameDisplay.textContent = newName;
+                    if (nameChanged) userNameDisplay.textContent = sanitizedName;
                     setTimeout(() => { closeAllModals(); }, 2000);
                 } catch (error) {
                      if (error.code === 'auth/wrong-password') {
@@ -1053,4 +1084,3 @@
     </script>
 </body>
 </html>
-
