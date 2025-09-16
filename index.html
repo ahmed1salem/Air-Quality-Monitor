@@ -35,7 +35,7 @@
         .hero-bg { background-color: #111827; background-image: radial-gradient(circle at 1px 1px, #4b5563 1px, transparent 0); background-size: 25px 25px; }
         .leaflet-control-geocoder-form input { font-family: var(--font-primary); }
         html[lang="ar"] .leaflet-control-geocoder-form input { font-family: var(--font-secondary); }
-        #history-list li { cursor: pointer; transition: background-color: 0.2s; }
+        #history-list li { cursor: pointer; transition: background-color 0.2s; }
         #history-list li:hover { background-color: #f3f4f6; }
         
         .leaflet-control-container .leaflet-top {
@@ -61,6 +61,9 @@
                 <form id="login-form">
                     <input id="login-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
                     <input id="login-password" type="password" class="w-full p-3 mb-4 border rounded" required placeholder="Password" data-lang-key="passwordPlaceholder">
+                    <div class="text-right mb-4">
+                        <a href="#" id="forgot-password-link" class="text-sm text-blue-600 hover:underline" data-lang-key="forgotPasswordLink">Forgot Password?</a>
+                    </div>
                     <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="loginButton">Login</button>
                 </form>
                 <p id="login-error" class="text-red-500 text-sm mt-4 text-center"></p>
@@ -85,6 +88,19 @@
                     <span data-lang-key="hasAccount">Already have an account?</span>
                     <a href="#" id="show-login" class="text-blue-600 hover:underline" data-lang-key="loginLink">Login</a>
                 </p>
+            </div>
+        </div>
+        <!-- Forgot Password Modal -->
+        <div id="forgot-password-modal" class="fixed inset-0 bg-black bg-opacity-50 z-[2000] flex justify-center items-center hidden">
+            <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md mx-4 relative">
+                 <button id="close-forgot-password-modal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">&times;</button>
+                <h3 class="text-2xl font-bold mb-6 text-center" data-lang-key="forgotPasswordTitle">Reset Password</h3>
+                <form id="forgot-password-form">
+                    <p class="text-center text-gray-600 mb-4" data-lang-key="forgotPasswordInstructions">Enter your email and we'll send you a link to reset your password.</p>
+                    <input id="forgot-email" type="email" class="w-full p-3 mb-4 border rounded" required placeholder="Email" data-lang-key="emailPlaceholder">
+                    <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded font-bold hover:bg-blue-700" data-lang-key="sendResetLinkButton">Send Reset Link</button>
+                </form>
+                <p id="forgot-password-feedback" class="text-sm mt-4 text-center"></p>
             </div>
         </div>
         <!-- Change Password Modal -->
@@ -279,7 +295,8 @@
             signOut, 
             updatePassword,
             EmailAuthProvider,
-            reauthenticateWithCredential
+            reauthenticateWithCredential,
+            sendPasswordResetEmail
         } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -311,6 +328,11 @@
                 signupButton: "Sign Up",
                 hasAccount: "Already have an account?",
                 loginLink: "Login",
+                forgotPasswordLink: "Forgot Password?",
+                forgotPasswordTitle: "Reset Password",
+                forgotPasswordInstructions: "Enter your email and we'll send you a link to reset your password.",
+                sendResetLinkButton: "Send Reset Link",
+                resetEmailSent: "Password reset email sent! Please check your inbox.",
                 changePasswordTitle: "Change Password",
                 currentPasswordPlaceholder: "Current Password",
                 newPasswordPlaceholder: "New Password (min. 6 characters)",
@@ -359,6 +381,11 @@
                 signupButton: "إنشاء حساب",
                 hasAccount: "هل لديك حساب بالفعل؟",
                 loginLink: "تسجيل الدخول",
+                forgotPasswordLink: "هل نسيت كلمة المرور؟",
+                forgotPasswordTitle: "إعادة تعيين كلمة المرور",
+                forgotPasswordInstructions: "أدخل بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+                sendResetLinkButton: "أرسل رابط الاستعادة",
+                resetEmailSent: "تم إرسال بريد إعادة تعيين كلمة المرور! يرجى التحقق من بريدك الوارد.",
                 changePasswordTitle: "تغيير كلمة المرور",
                 currentPasswordPlaceholder: "كلمة المرور الحالية",
                 newPasswordPlaceholder: "كلمة المرور الجديدة (6 أحرف على الأقل)",
@@ -425,10 +452,12 @@
             const loginModal = document.getElementById('login-modal');
             const signupModal = document.getElementById('signup-modal');
             const passwordChangeModal = document.getElementById('password-change-modal');
+            const forgotPasswordModal = document.getElementById('forgot-password-modal');
             const historyModal = document.getElementById('history-modal');
             const loginForm = document.getElementById('login-form');
             const signupForm = document.getElementById('signup-form');
             const passwordChangeForm = document.getElementById('password-change-form');
+            const forgotPasswordForm = document.getElementById('forgot-password-form');
             const historyList = document.getElementById('history-list');
             const noHistoryMessage = document.getElementById('no-history-message');
 
@@ -552,6 +581,11 @@
                 userMenu.classList.add('hidden');
                 passwordChangeModal.classList.remove('hidden');
             });
+             document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                loginModal.classList.add('hidden');
+                forgotPasswordModal.classList.remove('hidden');
+            });
             document.getElementById('history-btn').addEventListener('click', (e) => {
                 e.preventDefault();
                 userMenu.classList.add('hidden');
@@ -560,18 +594,16 @@
             });
 
             const closeAllModals = () => {
-                loginModal.classList.add('hidden');
-                signupModal.classList.add('hidden');
-                passwordChangeModal.classList.add('hidden');
-                historyModal.classList.add('hidden');
+                document.querySelectorAll('#auth-modals > div').forEach(modal => modal.classList.add('hidden'));
                 // FIX: Clear any previous feedback messages
-                const feedbackElements = document.querySelectorAll('#login-error, #signup-error, #password-change-feedback');
+                const feedbackElements = document.querySelectorAll('#login-error, #signup-error, #password-change-feedback, #forgot-password-feedback');
                 feedbackElements.forEach(el => el.textContent = '');
             };
 
             document.getElementById('close-login-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-signup-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-password-change-modal').addEventListener('click', closeAllModals);
+            document.getElementById('close-forgot-password-modal').addEventListener('click', closeAllModals);
             document.getElementById('close-history-modal').addEventListener('click', closeAllModals);
             
             document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.add('hidden'); signupModal.classList.remove('hidden'); });
@@ -626,10 +658,7 @@
                     feedbackEl.textContent = translations[currentLang].passwordUpdateSuccess;
                     feedbackEl.className = "text-green-500 text-sm mt-4 text-center";
                     passwordChangeForm.reset();
-                    setTimeout(() => { 
-                        closeAllModals(); 
-                        feedbackEl.textContent = ""; 
-                    }, 2000);
+                    setTimeout(() => { closeAllModals(); }, 2000);
                 }).catch((error) => {
                     if (error.code === 'auth/wrong-password') {
                         feedbackEl.textContent = translations[currentLang].passwordUpdateError;
@@ -639,7 +668,26 @@
                     feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
                 });
             });
-            
+
+            forgotPasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('forgot-email').value;
+                const feedbackEl = document.getElementById('forgot-password-feedback');
+                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+                
+                sendPasswordResetEmail(auth, email)
+                    .then(() => {
+                        feedbackEl.textContent = translations[currentLang].resetEmailSent;
+                        feedbackEl.className = "text-green-500 text-sm mt-4 text-center";
+                        forgotPasswordForm.reset();
+                         setTimeout(() => { closeAllModals(); }, 3000);
+                    })
+                    .catch((error) => {
+                        feedbackEl.textContent = error.message;
+                        feedbackEl.className = "text-red-500 text-sm mt-4 text-center";
+                    });
+            });
+
             // --- HISTORY LOGIC (FIRESTORE) ---
             const saveSearchToHistory = (locationData) => {
                 const user = auth.currentUser;
@@ -676,7 +724,7 @@
                             li.className = 'p-3 border-b border-gray-200';
                             li.innerHTML = `
                                 <p class="font-semibold">${data.name}</p>
-                                <p class="text-sm text-gray-500">Searched on: ${new Date(data.timestamp?.toDate()).toLocaleString()}</p>
+                                <p class="text-sm text-gray-500">Searched on: ${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
                             `;
                             li.addEventListener('click', () => {
                                 closeAllModals();
@@ -698,7 +746,7 @@
 
             // --- MAP APPLICATION LOGIC (INITIALIZED ON DEMAND) ---
             function initializeMapApp() {
-                // API KEYS (Add your own keys here)
+                // API KEYS
                 const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0";
                 const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
 
@@ -708,7 +756,7 @@
                     <button id="locate-btn" class="absolute bottom-4 left-4 z-[1000] bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Find my location">
                         <svg id="locate-icon" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor" class="text-gray-600"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
                     </button>
-                    <div id="data-panel" class="absolute top-36 sm:top-24 left-2 right-2 sm:left-auto sm:right-4 sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden">
+                    <div id="data-panel" class="absolute top-[140px] sm:top-24 left-2 right-2 sm:left-auto sm:right-4 sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden">
                         <div id="loading" class="flex justify-center items-center h-48"><div class="loader"></div></div>
                         <div id="data-content" class="hidden relative">
                             <button id="close-panel-btn" class="absolute top-0 right-0 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
@@ -872,4 +920,3 @@
     </script>
 </body>
 </html>
-
