@@ -57,18 +57,6 @@
                 top: 130px; /* More space for wrapped header */
             }
         }
-
-        /* Animation Styles */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-            transition-delay: var(--delay, 0s);
-        }
-        .animate-on-scroll.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
     </style>
 </head>
 <body class="text-gray-800">
@@ -211,23 +199,23 @@
              <!-- Added padding-top to account for the taller header -->
             <section class="hero-bg text-white pt-48 sm:pt-32 pb-20 text-center">
                 <div class="container mx-auto px-4">
-                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 leading-tight animate-on-scroll" data-lang-key="heroTitle">Breathe Clearer. Live Better.</h2>
-                    <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto animate-on-scroll" style="--delay: 150ms;" data-lang-key="heroSubtitle">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
-                    <a href="#map" id="launch-map-btn" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-transform transform hover:scale-105 inline-block animate-on-scroll" style="--delay: 300ms;" data-lang-key="heroButton">Launch Live Map</a>
+                    <h2 class="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 leading-tight" data-lang-key="heroTitle">Breathe Clearer. Live Better.</h2>
+                    <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto" data-lang-key="heroSubtitle">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
+                    <a href="#map" id="launch-map-btn" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-transform transform hover:scale-105 inline-block" data-lang-key="heroButton">Launch Live Map</a>
                 </div>
             </section>
             
             <!-- NEW Detailed Features Section -->
             <section id="about-features" class="py-20 bg-white">
                 <div class="container mx-auto px-4">
-                    <div class="text-center mb-16 animate-on-scroll">
+                    <div class="text-center mb-16">
                         <h2 class="text-3xl md:text-4xl font-bold" data-lang-key="aboutTitle">A Comprehensive Tool for Your Well-being</h2>
                         <p class="text-gray-600 mt-4 max-w-3xl mx-auto" data-lang-key="aboutSubtitle">We combine air quality, weather data, and personalized features to give you a complete picture of your environment.</p>
                     </div>
             
                     <div class="space-y-16">
                         <!-- Feature 1: Interactive Map -->
-                        <div class="flex flex-wrap items-center animate-on-scroll">
+                        <div class="flex flex-wrap items-center">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
                                 <div class="p-3 text-blue-600 bg-blue-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -241,7 +229,7 @@
                         </div>
 
                         <!-- Feature 2: Detailed Data Panel -->
-                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse animate-on-scroll">
+                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8 mt-8 md:mt-0">
                                 <div class="p-3 text-green-600 bg-green-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -255,7 +243,7 @@
                         </div>
                         
                         <!-- Feature 3: Search -->
-                        <div class="flex flex-wrap items-center animate-on-scroll">
+                        <div class="flex flex-wrap items-center">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
                                 <div class="p-3 text-purple-600 bg-purple-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -269,7 +257,7 @@
                         </div>
                         
                         <!-- Feature 4: Health Advice -->
-                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse animate-on-scroll">
+                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8 mt-8 md:mt-0">
                                 <div class="p-3 text-red-600 bg-red-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
@@ -289,22 +277,22 @@
             <!-- Advanced Features Section -->
             <section id="advanced-features" class="bg-gray-50 py-20">
                 <div class="container mx-auto px-4 text-center">
-                     <div class="animate-on-scroll">
+                     <div>
                         <h3 class="text-3xl font-bold mb-2" data-lang-key="advFeaturesTitle">Advanced Account Features</h3>
                         <p class="text-gray-600 mb-12" data-lang-key="advFeaturesSubtitle">Get more out of the monitor with a free account.</p>
                      </div>
                      <div class="grid md:grid-cols-3 gap-8">
-                         <div class="p-6 bg-white rounded-lg shadow-md animate-on-scroll" style="--delay: 0ms;">
+                         <div class="p-6 bg-white rounded-lg shadow-md">
                             <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                              <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature1Title">Secure Accounts</h4>
                              <p class="text-gray-600" data-lang-key="advFeature1Desc">Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.</p>
                          </div>
-                         <div class="p-6 bg-white rounded-lg shadow-md animate-on-scroll" style="--delay: 150ms;">
+                         <div class="p-6 bg-white rounded-lg shadow-md">
                              <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                              <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature2Title">Cloud History</h4>
                              <p class="text-gray-600" data-lang-key="advFeature2Desc">Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.</p>
                          </div>
-                         <div class="p-6 bg-white rounded-lg shadow-md animate-on-scroll" style="--delay: 300ms;">
+                         <div class="p-6 bg-white rounded-lg shadow-md">
                             <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                              <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature3Title">Account Management</h4>
                              <p class="text-gray-600" data-lang-key="advFeature3Desc">Easily manage your account settings, including the ability to change your password at any time to keep your account secure.</p>
@@ -594,6 +582,7 @@
             
             const preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
             setLanguage(preferredLanguage);
+
 
             // --- VIEW MANAGEMENT ---
             const showLandingPage = () => {
@@ -904,29 +893,6 @@
                 }
             };
 
-            // --- NOTIFICATION SUBSCRIPTION LOGIC ---
-            async function handleSubscription(currentCityData) {
-                const user = auth.currentUser;
-                if (!user) return;
-                
-                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
-
-                try {
-                    const permission = await Notification.requestPermission();
-                    if (permission === 'granted') {
-                        const fcmToken = await getToken(messaging, { vapidKey: 'YOUR_VAPID_KEY_FROM_FIREBASE_SETTINGS' });
-                        
-                        if (fcmToken) {
-                            const subscriptionRef = doc(db, 'subscriptions', user.uid, 'cities', currentCityData.name.replace(/[/]/g, '_')); // Sanitize doc ID
-                            await setDoc(subscriptionRef, { ...currentCityData, fcmToken });
-                            alert(translations[currentLang].subscriptionSaved);
-                        }
-                    }
-                } catch (error) {
-                    console.error('An error occurred while getting token. ', error);
-                }
-            }
-
 
             // --- MAP APPLICATION LOGIC (INITIALIZED ON DEMAND) ---
             function initializeMapApp() {
@@ -966,7 +932,6 @@
                                 <p id="forecast-text" class="text-xs text-gray-700">Analyzing data...</p>
                             </div>
                             <button id="show-history-chart-btn" class="w-full mt-2 bg-gray-200 text-gray-700 p-2 rounded hover:bg-gray-300 text-sm" data-lang-key="showHistoricalTrend">Show Historical Trend</button>
-                            <button id="subscribe-btn" class="w-full mt-2 bg-blue-100 text-blue-700 p-2 rounded hover:bg-blue-200 text-sm" data-lang-key="subscribeToAlerts">Subscribe to Alerts</button>
                             <div id="chart-container" class="mt-4 hidden"><canvas id="aqi-chart"></canvas></div>
                         </div>
                     </div>
@@ -985,7 +950,6 @@
                 const windValueEl = document.getElementById('wind-value');
                 const forecastTextEl = document.getElementById('forecast-text');
                 const showHistoryChartBtn = document.getElementById('show-history-chart-btn');
-                const subscribeBtn = document.getElementById('subscribe-btn');
                 const chartContainer = document.getElementById('chart-container');
 
                 // Map Initialization
@@ -996,13 +960,15 @@
                 
                 let marker = L.marker([26.8206, 30.8025], { opacity: 0 }).addTo(map);
 
-                // --- TEMPO Layer ---
-                const today = new Date();
-                const formattedDate = today.toISOString().split('T')[0];
+                // --- TEMPO Layer FIX ---
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                const formattedDate = yesterday.toISOString().split('T')[0];
                 const tempoLayer = L.tileLayer(
                     `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/TEMPO_NO2_L2_V01_ColumnAmount/default/${formattedDate}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`, {
                         attribution: '<a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a>',
-                        tileSize: 256
+                        tileSize: 256,
+                        opacity: 0.7
                     }
                 );
 
@@ -1025,35 +991,31 @@
                     fetchAllDataForLocation(center.lat, center.lng);
                 }).addTo(map);
 
-                // --- DATA FETCHING & UI LOGIC ---
+                // --- DATA FETCHING & UI LOGIC (FIXED) ---
                 const fetchAllDataForLocation = async (lat, lng) => {
                     chartContainer.classList.add('hidden');
                     dataPanel.classList.remove('hidden');
                     loadingDiv.classList.remove('hidden');
                     dataContentDiv.classList.add('hidden');
                     
-                    try {
-                        const results = await Promise.allSettled([
-                            fetchAqiData(lat, lng), 
-                            fetchWeatherData(lat, lng)
-                        ]);
+                    const results = await Promise.allSettled([
+                        fetchAqiData(lat, lng), 
+                        fetchWeatherData(lat, lng)
+                    ]);
 
-                        const aqiResult = results[0];
-                        const weatherResult = results[1];
+                    const aqiResult = results[0];
+                    const weatherResult = results[1];
 
-                        const aqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
-                        const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
+                    const aqiData = aqiResult.status === 'fulfilled' ? aqiResult.value : null;
+                    const weatherData = weatherResult.status === 'fulfilled' ? weatherResult.value : null;
 
-                        if (aqiResult.status === 'rejected') console.error("AQI Fetch Error:", aqiResult.reason);
-                        if (weatherResult.status === 'rejected') console.error("Weather Fetch Error:", weatherResult.reason);
-                        
-                        if (!aqiData && !weatherData) {
-                            handleError("Failed to fetch all data. Please try again.");
-                        } else {
-                            updateUIPanel({ aqiData, weatherData, lat, lng });
-                        }
-                    } catch (error) {
-                        handleError(error.message);
+                    if (aqiResult.status === 'rejected') console.error("AQI Fetch Error:", aqiResult.reason);
+                    if (weatherResult.status === 'rejected') console.error("Weather Fetch Error:", weatherResult.reason);
+                    
+                    if (!aqiData && !weatherData) {
+                        handleError("Failed to fetch all data. Please try again.");
+                    } else {
+                        updateUIPanel({ aqiData, weatherData, lat, lng });
                     }
                 };
                 
@@ -1136,7 +1098,7 @@
                 });
                 map.on('locationerror', (e) => console.error("Location Error: ", e.message));
 
-                // --- ADVANCED FEATURES LOGIC ---
+                // --- ADVANCED FEATURES LOGIC (FIXED) ---
                 showHistoryChartBtn.addEventListener('click', async () => {
                     chartContainer.innerHTML = '<div class="flex justify-center items-center h-24"><div class="loader"></div></div>';
                     chartContainer.classList.remove('hidden');
@@ -1147,8 +1109,6 @@
                         chartContainer.innerHTML = `<p class="text-center text-sm text-red-500">${error.message}</p>`;
                     }
                 });
-                
-                subscribeBtn.addEventListener('click', () => handleSubscription(currentCityData));
 
                 async function fetchHistoricalData(lat, lng) {
                     const dateTo = new Date().toISOString().split('T')[0];
@@ -1157,7 +1117,7 @@
                     const response = await fetch(url, { headers: { "X-API-Key": OPENAQ_API_KEY } });
                     if (!response.ok) throw new Error("Could not fetch historical data.");
                     const data = await response.json();
-                    if (data.results.length === 0) throw new Error("No historical data found for the past 7 days.");
+                    if (!data.results || data.results.length === 0) throw new Error("No historical data found for the past 7 days.");
                     return data;
                 }
 
@@ -1186,17 +1146,6 @@
                     });
                 }
             }
-            
-            // --- INTERSECTION OBSERVER FOR ANIMATIONS ---
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
         });
     </script>
 </body>
