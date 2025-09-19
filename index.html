@@ -345,13 +345,20 @@
         import { 
             getFirestore, 
             collection, 
-            addDoc, 
+            addDoc,
+            doc,
+            setDoc, 
             query, 
             orderBy, 
             limit, 
             getDocs, 
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { 
+            getMessaging, 
+            getToken, 
+            onMessage 
+        } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js";
 
         // --- TRANSLATIONS OBJECT ---
         const translations = {
@@ -502,6 +509,7 @@
             const analytics = getAnalytics(app);
             const auth = getAuth(app);
             const db = getFirestore(app);
+            const messaging = getMessaging(app);
 
             // --- UI ELEMENTS ---
             const landingPage = document.getElementById('landing-page');
@@ -587,24 +595,6 @@
             const preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
             setLanguage(preferredLanguage);
 
-
-            // --- AUTHENTICATION STATE OBSERVER ---
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    loggedOutContainer.classList.add('hidden');
-                    loggedInContainer.classList.remove('hidden');
-                    userNameDisplay.textContent = user.displayName || user.email;
-                    if(window.location.hash === '#map' && !mapInitialized) {
-                       showMapView();
-                    }
-                } else {
-                    loggedOutContainer.classList.remove('hidden');
-                    loggedInContainer.classList.add('hidden');
-                    userNameDisplay.textContent = '';
-                    showLandingPage();
-                }
-            });
-
             // --- VIEW MANAGEMENT ---
             const showLandingPage = () => {
                 landingPage.classList.remove('hidden');
@@ -623,6 +613,23 @@
                 }
                 setTimeout(() => { if (map) map.invalidateSize(); }, 0);
             };
+            
+            // --- AUTHENTICATION STATE OBSERVER ---
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    loggedOutContainer.classList.add('hidden');
+                    loggedInContainer.classList.remove('hidden');
+                    userNameDisplay.textContent = user.displayName || user.email;
+                    if(window.location.hash === '#map' && !mapInitialized) {
+                       showMapView();
+                    }
+                } else {
+                    loggedOutContainer.classList.remove('hidden');
+                    loggedInContainer.classList.add('hidden');
+                    userNameDisplay.textContent = '';
+                    showLandingPage();
+                }
+            });
             
             document.getElementById('launch-map-btn').addEventListener('click', (e) => {
                 e.preventDefault();
@@ -905,9 +912,8 @@
                 const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
                 const OPENAQ_API_KEY = "7914df4746c003fda530b5a83898c88523a2e1c1db194d79eee71b99f152f9ac";
                 
-                let currentCityData = {}; // To store current location data for alerts
+                let currentCityData = {}; 
                 let myChart = null;
-
 
                 // Inject map UI elements
                 mapContainer.innerHTML = `
@@ -1011,23 +1017,64 @@
                     }
                 };
                 
-                const fetchAqiData = async (lat, lng) => { /* ... (same as before) ... */ };
-                const fetchWeatherData = async (lat, lng) => { /* ... (same as before) ... */ };
-                const getAqiStatus = (aqi) => { /* ... (same as before) ... */ };
+                const fetchAqiData = async (lat, lng) => {
+                    const url = `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_API_KEY}`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Could not fetch AQI data.');
+                    const data = await response.json();
+                    if (data.status !== "ok") throw new Error(data.data || 'No station found.');
+                    return data.data;
+                };
+
+                const fetchWeatherData = async (lat, lng) => {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Could not fetch weather data.');
+                    return await response.json();
+                };
+                
+                const getAqiStatus = (aqi) => {
+                     if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
+                     if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
+                     if (aqi <= 150) return { status: "Unhealthy for Sensitive", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
+                     if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
+                     if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
+                     return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
+                };
 
                 const updateUIPanel = ({ aqiData, weatherData, lat, lng }) => {
                     if (aqiData && aqiData.city) {
                         currentCityData = { name: aqiData.city.name, lat, lng };
-                        // ... rest of the update logic
+                        cityNameEl.textContent = aqiData.city.name;
+                        updateTimeEl.textContent = `Updated: ${new Date(aqiData.time.s).toLocaleString()}`;
+                        aqiValueEl.textContent = aqiData.aqi;
+                        const { status, color, advice } = getAqiStatus(aqiData.aqi);
+                        aqiStatusEl.textContent = status;
+                        aqiStatusEl.style.backgroundColor = color;
+                        forecastTextEl.textContent = advice;
                     } else {
                         handleError("AQI data not available for this location.");
                     }
-                    // ... rest of the update logic
+
+                    if (weatherData && weatherData.main) {
+                        tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
+                        humidityValueEl.textContent = `${weatherData.main.humidity}%`;
+                        windValueEl.textContent = `${Math.round(weatherData.wind.speed * 3.6)} km/h`;
+                    }
                     loadingDiv.classList.add('hidden');
                     dataContentDiv.classList.remove('hidden');
                 };
                 
-                const handleError = (message) => { /* ... (same as before) ... */ };
+                const handleError = (message) => {
+                    cityNameEl.textContent = "Error";
+                    updateTimeEl.textContent = "";
+                    aqiValueEl.textContent = "N/A";
+                    aqiStatusEl.textContent = "No Data";
+                    aqiStatusEl.style.backgroundColor = "#9ca3af";
+                    forecastTextEl.textContent = message;
+                    loadingDiv.classList.add('hidden');
+                    dataContentDiv.classList.remove('hidden');
+                };
 
                 map.on('click', function(e) {
                     const { lat, lng } = e.latlng;
@@ -1051,9 +1098,8 @@
 
                 // --- ADVANCED FEATURES LOGIC ---
                 showHistoryChartBtn.addEventListener('click', async () => {
-                    loadingDiv.innerHTML = '<div class="loader"></div>';
+                    chartContainer.innerHTML = '<div class="flex justify-center items-center h-24"><div class="loader"></div></div>';
                     chartContainer.classList.remove('hidden');
-                    chartContainer.innerHTML = '<canvas id="aqi-chart"></canvas>'; // Reset canvas
                     try {
                         const historicalData = await fetchHistoricalData(currentCityData.lat, currentCityData.lng);
                         displayChart(historicalData);
@@ -1062,16 +1108,7 @@
                     }
                 });
                 
-                subscribeBtn.addEventListener('click', () => {
-                    const user = auth.currentUser;
-                    if (!user) return;
-                    // This is the frontend part. A backend Cloud Function is needed to send notifications.
-                    // For now, we save the subscription to Firestore.
-                    const subRef = collection(db, 'subscriptions', user.uid, 'cities');
-                    addDoc(subRef, currentCityData)
-                        .then(() => alert(translations[localStorage.getItem('preferredLanguage') || 'en'].subscriptionSaved))
-                        .catch(err => console.error(err));
-                });
+                subscribeBtn.addEventListener('click', () => handleSubscription(currentCityData));
 
                 async function fetchHistoricalData(lat, lng) {
                     const dateTo = new Date().toISOString().split('T')[0];
@@ -1085,6 +1122,7 @@
                 }
 
                 function displayChart(historicalData) {
+                    chartContainer.innerHTML = '<canvas id="aqi-chart"></canvas>'; // Reset canvas
                     const ctx = document.getElementById('aqi-chart').getContext('2d');
                     const labels = historicalData.results.map(d => new Date(d.date.local).toLocaleDateString()).reverse();
                     const dataPoints = historicalData.results.map(d => d.value).reverse();
