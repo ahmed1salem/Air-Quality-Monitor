@@ -196,7 +196,7 @@
                     <!-- Theme Switcher -->
                     <button id="theme-toggle" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
                         <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.121-1.414a1 1 0 01-.707.293h-1a1 1 0 110-2h1a1 1 0 01.707.293l.001.001zM12 18a1 1 0 01.993.883l.007.117v1a1 1 0 01-2 0v-1a1 1 0 011-1zM5.05 14.464A1 1 0 106.465 13.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zm1.414-9.914a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM4 11a1 1 0 110-2h-1a1 1 0 110-2h1a1 1 0 01.707.293l.001.001z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 15a5 5 0 100-10 5 5 0 000 10zM10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-7-8a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-2.929-5.071a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zm-9.142 9.142a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707.707zm9.142 0a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707zm-9.142-9.142a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
                     </button>
 
                     <!-- Auth Buttons / User Menu -->
@@ -442,6 +442,23 @@
                 dataPanelWind: "Wind",
                 dataPanelHealthAdvice: "Health Advice:",
                 footerText: "© 2024 All rights reserved for Digital Minds team",
+                // AQI Statuses and Advice
+                aqiStatusGood: "Good",
+                aqiAdviceGood: "Air quality is excellent. Great day to be active outside!",
+                aqiStatusModerate: "Moderate",
+                aqiAdviceModerate: "Air quality is acceptable. Sensitive individuals may have symptoms.",
+                aqiStatusUnhealthySensitive: "Unhealthy for Sensitive",
+                aqiAdviceUnhealthySensitive: "Sensitive groups should reduce heavy exertion outdoors.",
+                aqiStatusUnhealthy: "Unhealthy",
+                aqiAdviceUnhealthy: "Everyone should reduce heavy exertion outdoors.",
+                aqiStatusVeryUnhealthy: "Very Unhealthy",
+                aqiAdviceVeryUnhealthy: "Health alert: Avoid all outdoor physical activity.",
+                aqiStatusHazardous: "Hazardous",
+                aqiAdviceHazardous: "Health warning: Everyone should stay indoors.",
+                aqiStatusNoData: "No Data",
+                aqiError: "AQI data not available for this location.",
+                fetchError: "Failed to fetch all data. Please try again.",
+                errorTitle: "Error"
             },
             ar: {
                 appName: "مراقب جودة الهواء",
@@ -506,6 +523,23 @@
                 dataPanelWind: "الرياح",
                 dataPanelHealthAdvice: "نصيحة صحية:",
                 footerText: "© 2024 جميع الحقوق محفوظة لفريق Digital Minds",
+                 // AQI Statuses and Advice
+                aqiStatusGood: "جيد",
+                aqiAdviceGood: "جودة الهواء ممتازة. يوم رائع للنشاط في الخارج!",
+                aqiStatusModerate: "متوسط",
+                aqiAdviceModerate: "جودة الهواء مقبولة. قد يعاني الأفراد الحساسون من أعراض.",
+                aqiStatusUnhealthySensitive: "غير صحي للحساسين",
+                aqiAdviceUnhealthySensitive: "يجب على المجموعات الحساسة تقليل المجهود الشاق في الهواء الطلق.",
+                aqiStatusUnhealthy: "غير صحي",
+                aqiAdviceUnhealthy: "يجب على الجميع تقليل المجهود الشاق في الهواء الطلق.",
+                aqiStatusVeryUnhealthy: "غير صحي للغاية",
+                aqiAdviceVeryUnhealthy: "تنبيه صحي: تجنب كل الأنشطة البدنية في الهواء الطلق.",
+                aqiStatusHazardous: "خطير",
+                aqiAdviceHazardous: "تحذير صحي: يجب على الجميع البقاء في الداخل.",
+                aqiStatusNoData: "لا توجد بيانات",
+                aqiError: "بيانات جودة الهواء غير متوفرة لهذا الموقع.",
+                fetchError: "فشل جلب جميع البيانات. يرجى المحاولة مرة أخرى.",
+                errorTitle: "خطأ"
             }
         };
 
@@ -1054,7 +1088,8 @@
                     if (weatherResult.status === 'rejected') console.error("Weather Fetch Error:", weatherResult.reason);
                     
                     if (!aqiData && !weatherData) {
-                        handleError("Failed to fetch all data. Please try again.");
+                        const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+                        handleError(translations[currentLang].fetchError);
                     } else {
                         updateUIPanel({ aqiData, weatherData, lat, lng });
                     }
@@ -1077,26 +1112,27 @@
                 };
                 
                 const getAqiStatus = (aqi) => {
-                     if (aqi <= 50) return { status: "Good", color: "#22c55e", advice: "Air quality is excellent. Great day to be active outside!" };
-                     if (aqi <= 100) return { status: "Moderate", color: "#facc15", advice: "Air quality is acceptable. Sensitive individuals may have symptoms." };
-                     if (aqi <= 150) return { status: "Unhealthy for Sensitive", color: "#f97316", advice: "Sensitive groups should reduce heavy exertion outdoors." };
-                     if (aqi <= 200) return { status: "Unhealthy", color: "#ef4444", advice: "Everyone should reduce heavy exertion outdoors." };
-                     if (aqi <= 300) return { status: "Very Unhealthy", color: "#a855f7", advice: "Health alert: Avoid all outdoor physical activity." };
-                     return { status: "Hazardous", color: "#7f1d1d", advice: "Health warning: Everyone should stay indoors." };
+                     if (aqi <= 50) return { statusKey: "aqiStatusGood", adviceKey: "aqiAdviceGood", color: "#22c55e" };
+                     if (aqi <= 100) return { statusKey: "aqiStatusModerate", adviceKey: "aqiAdviceModerate", color: "#facc15" };
+                     if (aqi <= 150) return { statusKey: "aqiStatusUnhealthySensitive", adviceKey: "aqiAdviceUnhealthySensitive", color: "#f97316" };
+                     if (aqi <= 200) return { statusKey: "aqiStatusUnhealthy", adviceKey: "aqiAdviceUnhealthy", color: "#ef4444" };
+                     if (aqi <= 300) return { statusKey: "aqiStatusVeryUnhealthy", adviceKey: "aqiAdviceVeryUnhealthy", color: "#a855f7" };
+                     return { statusKey: "aqiStatusHazardous", adviceKey: "aqiAdviceHazardous", color: "#7f1d1d" };
                 };
 
                 const updateUIPanel = ({ aqiData, weatherData, lat, lng }) => {
+                    const currentLang = localStorage.getItem('preferredLanguage') || 'en';
                     if (aqiData && aqiData.city) {
                         currentCityData = { name: aqiData.city.name, lat, lng };
                         cityNameEl.textContent = aqiData.city.name;
                         updateTimeEl.textContent = `Updated: ${new Date(aqiData.time.s).toLocaleString()}`;
                         aqiValueEl.textContent = aqiData.aqi;
-                        const { status, color, advice } = getAqiStatus(aqiData.aqi);
-                        aqiStatusEl.textContent = status;
+                        const { statusKey, adviceKey, color } = getAqiStatus(aqiData.aqi);
+                        aqiStatusEl.textContent = translations[currentLang][statusKey];
                         aqiStatusEl.style.backgroundColor = color;
-                        forecastTextEl.textContent = advice;
+                        forecastTextEl.textContent = translations[currentLang][adviceKey];
                     } else {
-                        handleError("AQI data not available for this location.");
+                        handleError(translations[currentLang].aqiError);
                     }
 
                     if (weatherData && weatherData.main) {
@@ -1106,14 +1142,15 @@
                     }
                     loadingDiv.classList.add('hidden');
                     dataContentDiv.classList.remove('hidden');
-                    setLanguage(localStorage.getItem('preferredLanguage') || 'en');
+                    setLanguage(currentLang);
                 };
                 
                 const handleError = (message) => {
-                    cityNameEl.textContent = "Error";
+                    const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+                    cityNameEl.textContent = translations[currentLang].errorTitle;
                     updateTimeEl.textContent = "";
                     aqiValueEl.textContent = "N/A";
-                    aqiStatusEl.textContent = "No Data";
+                    aqiStatusEl.textContent = translations[currentLang].aqiStatusNoData;
                     aqiStatusEl.style.backgroundColor = "#9ca3af";
                     forecastTextEl.textContent = message;
                     loadingDiv.classList.add('hidden');
@@ -1144,6 +1181,4 @@
     </script>
 </body>
 </html>
-
-
 
