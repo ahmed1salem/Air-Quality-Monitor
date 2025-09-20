@@ -409,10 +409,6 @@
                 advFeature3Title: "Account Management",
                 advFeature3Desc: "Easily manage your account settings, including the ability to change your password at any time to keep your account secure.",
                 showHistoricalTrend: "Show Historical Trend",
-                subscribeToAlerts: "Subscribe to Alerts",
-                unsubscribeFromAlerts: "Unsubscribe from Alerts",
-                subscriptionSaved: "Subscription saved! You will be notified of poor air quality.",
-                subscriptionRemoved: "You have unsubscribed from alerts for this city.",
             },
             ar: {
                 appName: "مراقب جودة الهواء",
@@ -472,10 +468,6 @@
                 advFeature3Title: "إدارة الحساب",
                 advFeature3Desc: "يمكنك إدارة إعدادات حسابك بسهولة، بما في ذلك القدرة على تغيير كلمة المرور في أي وقت للحفاظ على أمان حسابك.",
                 showHistoricalTrend: "عرض السجل البياني",
-                subscribeToAlerts: "الاشتراك في التنبيهات",
-                unsubscribeFromAlerts: "إلغاء الاشتراك في التنبيهات",
-                subscriptionSaved: "تم حفظ الاشتراك! سيتم تنبيهك عند سوء جودة الهواء.",
-                subscriptionRemoved: "تم إلغاء اشتراكك في تنبيهات هذه المدينة.",
             }
         };
 
@@ -497,8 +489,7 @@
             const analytics = getAnalytics(app);
             const auth = getAuth(app);
             const db = getFirestore(app);
-            const messaging = getMessaging(app);
-
+            
             // --- UI ELEMENTS ---
             const landingPage = document.getElementById('landing-page');
             const mapView = document.getElementById('map-view');
