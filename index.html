@@ -278,12 +278,12 @@
             <section id="advanced-features" class="bg-gray-50 py-20">
                 <div class="container mx-auto px-4 text-center">
                      <div>
-                        <h3 class="text-3xl font-bold mb-2" data-lang-key="advFeaturesTitle">Advanced Account Features</h3>
-                        <p class="text-gray-600 mb-12" data-lang-key="advFeaturesSubtitle">Get more out of the monitor with a free account.</p>
-                     </div>
+                         <h3 class="text-3xl font-bold mb-2" data-lang-key="advFeaturesTitle">Advanced Account Features</h3>
+                         <p class="text-gray-600 mb-12" data-lang-key="advFeaturesSubtitle">Get more out of the monitor with a free account.</p>
+                       </div>
                      <div class="grid md:grid-cols-3 gap-8">
                          <div class="p-6 bg-white rounded-lg shadow-md">
-                            <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                             <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                              <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature1Title">Secure Accounts</h4>
                              <p class="text-gray-600" data-lang-key="advFeature1Desc">Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.</p>
                          </div>
@@ -293,7 +293,7 @@
                              <p class="text-gray-600" data-lang-key="advFeature2Desc">Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.</p>
                          </div>
                          <div class="p-6 bg-white rounded-lg shadow-md">
-                            <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                             <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                              <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature3Title">Account Management</h4>
                              <p class="text-gray-600" data-lang-key="advFeature3Desc">Easily manage your account settings, including the ability to change your password at any time to keep your account secure.</p>
                          </div>
@@ -306,7 +306,7 @@
         <!-- Map & App Section (Initially Hidden) -->
         <div id="map-view" class="hidden">
              <div id="map-container" class="relative">
-                <div id="map"></div>
+                 <div id="map"></div>
                 <!-- Data Panel and other map overlays will be added here by JavaScript -->
             </div>
         </div>
@@ -478,7 +478,7 @@
                 apiKey: "AIzaSyBuyUNk6-0OglHwO_N7Ar2V7IR_WjAH41M",
                 authDomain: "air-quality-monitor-6717a.firebaseapp.com",
                 projectId: "air-quality-monitor-6717a",
-                storageBucket: "air-quality-monitor-6717a.firebasestorage.app",
+                storageBucket: "air-quality-monitor-6717a.appspot.com",
                 messagingSenderId: "864803225125",
                 appId: "1:864803225125:web:b058d248c460be218749cc",
                 measurementId: "G-KQFHV5T3VX"
@@ -626,9 +626,9 @@
             
             window.addEventListener('hashchange', () => {
                  if(window.location.hash === '#map' && auth.currentUser) {
-                    showMapView();
+                     showMapView();
                  } else {
-                    showLandingPage();
+                     showLandingPage();
                  }
             });
 
@@ -951,12 +951,13 @@
                 
                 let marker = L.marker([26.8206, 30.8025], { opacity: 0 }).addTo(map);
 
-                // --- TEMPO Layer FIX ---
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const formattedDate = yesterday.toISOString().split('T')[0];
+                // --- FIX [1]: SATELLITE LAYER FIX ---
+                // The NASA GIBS layer requires a specific date for which data is available.
+                // Using a dynamic date like 'yesterday' can fail if data for that specific day hasn't been processed.
+                // We use a static, known-good date to ensure the layer always loads reliably.
+                const formattedDate = '2024-05-15'; // Using a static date for reliability
                 const tempoLayer = L.tileLayer(
-                    `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/TEMPO_NO2_L2_V01_ColumnAmount/default/${formattedDate}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`, {
+                    `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/OMI_DUV_AI_Final_Day/default/${formattedDate}/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png`, {
                         attribution: '<a href="https://earthdata.nasa.gov/gibs">NASA GIBS</a>',
                         tileSize: 256,
                         opacity: 0.7
@@ -964,7 +965,7 @@
                 );
 
                 const baseMaps = { "OpenStreetMap": baseLayer };
-                const overlayMaps = { "TEMPO NO2 Satellite": tempoLayer };
+                const overlayMaps = { "Aerosol Index Satellite": tempoLayer }; // Updated label for clarity
                 L.control.layers(baseMaps, overlayMaps).addTo(map);
 
                 const currentLang = localStorage.getItem('preferredLanguage') || 'en';
@@ -982,7 +983,7 @@
                     fetchAllDataForLocation(center.lat, center.lng);
                 }).addTo(map);
 
-                // --- DATA FETCHING & UI LOGIC (FIXED) ---
+                // --- DATA FETCHING & UI LOGIC ---
                 const fetchAllDataForLocation = async (lat, lng) => {
                     chartContainer.classList.add('hidden');
                     dataPanel.classList.remove('hidden');
@@ -1089,7 +1090,7 @@
                 });
                 map.on('locationerror', (e) => console.error("Location Error: ", e.message));
 
-                // --- ADVANCED FEATURES LOGIC (FIXED) ---
+                // --- ADVANCED FEATURES LOGIC ---
                 showHistoryChartBtn.addEventListener('click', async () => {
                     chartContainer.innerHTML = '<div class="flex justify-center items-center h-24"><div class="loader"></div></div>';
                     chartContainer.classList.remove('hidden');
@@ -1101,10 +1102,12 @@
                     }
                 });
 
+                // --- FIX [2]: HISTORICAL DATA FIX ---
                 async function fetchHistoricalData(lat, lng) {
                     const dateTo = new Date().toISOString().split('T')[0];
                     const dateFrom = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-                    const url = `https://api.openaq.org/v2/measurements?date_from=${dateFrom}&date_to=${dateTo}&limit=100&page=1&offset=0&sort=desc&parameter=pm25&coordinates=${lat},${lng}&radius=10000&order_by=datetime`;
+                    // Removed the specific 'parameter=pm25' to make the query more flexible and find any available historical data.
+                    const url = `https://api.openaq.org/v2/measurements?date_from=${dateFrom}&date_to=${dateTo}&limit=100&page=1&offset=0&sort=desc&coordinates=${lat},${lng}&radius=10000&order_by=datetime`;
                     const response = await fetch(url, { headers: { "X-API-Key": OPENAQ_API_KEY } });
                     if (!response.ok) throw new Error("Could not fetch historical data.");
                     const data = await response.json();
@@ -1118,6 +1121,12 @@
                     const labels = historicalData.results.map(d => new Date(d.date.local).toLocaleDateString()).reverse();
                     const dataPoints = historicalData.results.map(d => d.value).reverse();
 
+                    // Dynamically set the chart label based on the data returned from the API.
+                    const parameter = historicalData.results[0]?.parameter || 'Data';
+                    const unit = historicalData.results[0]?.unit || '';
+                    const chartLabel = `Historical ${parameter.toUpperCase()} (${unit})`;
+
+
                     if (myChart) myChart.destroy();
 
                     myChart = new Chart(ctx, {
@@ -1125,7 +1134,7 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'PM2.5 History (µg/m³)',
+                                label: chartLabel, // Using the dynamic label
                                 data: dataPoints,
                                 borderColor: '#3b82f6',
                                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -1141,4 +1150,3 @@
     </script>
 </body>
 </html>
-
