@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Content Security Policy (CSP) for enhanced security -->
-    <meta http-equiv="Content-Security-Policy" 
-          content="default-src 'self'; 
-                   script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com https://www.gstatic.com https://cdn.jsdelivr.net; 
-                   style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com; 
-                   font-src 'self' https://fonts.gstatic.com; 
-                   img-src 'self' https: data: blob:;
-                   connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://fcmtoken.googleapis.com https://api.waqi.info https://api.openweathermap.org https://api.openaq.org https://gibs.earthdata.nasa.gov https://www.google-analytics.com https://firebaseinstallations.googleapis.com;">
+    <!-- Content Security Policy (CSP) has been removed -->
 
     <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
     <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
@@ -890,7 +883,7 @@
                 // API KEYS
                 const WAQI_API_KEY = "928a43b09b68edba7abf27fda1fa9a9a754fd8c0";
                 const OPENWEATHER_API_KEY = "8e8cc4c4a2a0e8af0a9a96d4d0277b58";
-                const OPENAQ_API_KEY = "7914df4746c003fda530b5a83898c88523a2e1c1db194d79eee71b99f152f9ac";
+                const OPENAQ_API_KEY = "121d65630df94ebdcd50a34047c7f97dd36b386db269eb6ea0e6fcfad83fed8d";
                 
                 let currentCityData = {}; 
                 let myChart = null;
@@ -1150,3 +1143,4 @@
     </script>
 </body>
 </html>
+
