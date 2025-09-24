@@ -50,7 +50,6 @@
         .leaflet-control-container .leaflet-top {
             top: 80px; 
         }
-        /* Responsive adjustments for header */
         @media (max-width: 640px) {
             .leaflet-control-container .leaflet-top {
                 top: 130px; /* More space for wrapped header */
@@ -76,6 +75,42 @@
         .dark .bg-gray-100 { background-color: #2a2a2a; }
         .dark .hover\:bg-gray-100:hover { background-color: #2a2a2a !important; }
         .dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+
+        /* --- Weather Animation Styles --- */
+        #weather-animation-container { background: linear-gradient(to bottom, #87CEEB, #B0E0E6); transition: background 0.5s; }
+        .dark #weather-animation-container { background: linear-gradient(to bottom, #0c1445, #2d3748); }
+        #weather-animation { position: relative; width: 100%; height: 100%; }
+        .sun, .cloud, .rain, .snow, .mist, .thunder { position: absolute; }
+
+        /* Sun */
+        .sun { top: 15%; left: 50%; width: 40px; height: 40px; background: #FFD700; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px #FFD700; animation: spin 20s linear infinite; }
+
+        /* Clouds */
+        .cloud { background: #fff; border-radius: 50%; width: 60px; height: 60px; top: 30%; left: -80px; animation: move-cloud 15s linear infinite; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+        .cloud::before { width: 40px; height: 40px; top: -20px; right: 10px; }
+        .cloud::after { width: 50px; height: 50px; top: -10px; left: 5px; }
+        .cloud.c2 { animation-delay: -5s; top: 45%; transform: scale(0.8); }
+        @keyframes move-cloud { 0% { left: -80px; } 100% { left: 110%; } }
+
+        /* Rain */
+        .rain { left: 0; top: 0; width: 100%; height: 100%; }
+        .rain > div { position: absolute; width: 2px; height: 10px; background: #77aadd; animation: fall 1s linear infinite; }
+        @keyframes fall { 0% { transform: translateY(-20px); } 100% { transform: translateY(120px); } }
+
+        /* Snow */
+        .snow > div { position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; animation: snowfall 5s linear infinite; }
+        @keyframes snowfall { 0% { transform: translateY(-20px) translateX(0); } 100% { transform: translateY(120px) translateX(20px); } }
+
+        /* Mist */
+        .mist > div { position: absolute; width: 120%; height: 30px; background: rgba(255,255,255,0.4); border-radius: 15px; bottom: 0; left: -10%; animation: move-mist 10s linear infinite alternate; }
+        .mist > div.m2 { animation-delay: -5s; opacity: 0.7; }
+        @keyframes move-mist { from { transform: translateX(-20px); } to { transform: translateX(20px); } }
+
+        /* Thunderstorm */
+        .thunder { width: 100%; height: 100%; background: rgba(255, 255, 0, 0.3); opacity: 0; animation: lightning 3s linear infinite; }
+        @keyframes lightning { 0%, 100% { opacity: 0; } 50% { opacity: 1; } 52% { opacity: 0; } 55% { opacity: 1; } 56% { opacity: 0; } }
+
     </style>
 </head>
 <body class="text-gray-800">
@@ -541,7 +576,7 @@
                 aqiStatusUnhealthy: "غير صحي",
                 aqiAdviceUnhealthy: "يجب على الجميع تقليل المجهود الشاق في الهواء الطلق.",
                 aqiStatusVeryUnhealthy: "غير صحي للغاية",
-                aqiAdviceVeryUnhealthy: "تنبيه صحي: تجنب كل الأنشطة البدنية في الهواء الطلق.",
+                aqiAdviceVeryUnhealthy: "تنبيه صحي: تجنب כל الأنشطة البدنية في الهواء الطلق.",
                 aqiStatusHazardous: "خطير",
                 aqiAdviceHazardous: "تحذير صحي: يجب على الجميع البقاء في الداخل.",
                 aqiStatusNoData: "لا توجد بيانات",
@@ -744,6 +779,8 @@
                         const aqiLabel = translations[currentLang].dataPanelAQI;
                         const aqiValue = document.getElementById('aqi-value').innerText;
                         const aqiStatus = document.getElementById('aqi-status').innerText;
+                        
+                        const weatherDescription = document.getElementById('weather-description').innerText;
 
                         const tempLabel = translations[currentLang].dataPanelTemp;
                         const tempValue = document.getElementById('temp-value').innerText;
@@ -755,7 +792,7 @@
                         const adviceLabel = translations[currentLang].dataPanelHealthAdvice;
                         const advice = document.getElementById('forecast-text').innerText;
                         
-                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${tempLabel}: ${tempValue}. ${humidityLabel}: ${humidityValue}. ${windLabel}: ${windValue}. ${adviceLabel}: ${advice}`;
+                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${weatherDescription}. ${tempLabel}: ${tempValue}. ${humidityLabel}: ${humidityValue}. ${windLabel}: ${windValue}. ${adviceLabel}: ${advice}`;
                     } else {
                         textToRead = currentLang === 'ar' ? 'الرجاء تحديد موقع على الخريطة أولاً.' : 'Please select a location on the map first.';
                     }
@@ -1117,6 +1154,10 @@
                                 <div id="aqi-value" class="text-6xl font-bold my-2 text-gray-700">--</div>
                                 <div id="aqi-status" class="px-3 py-1 text-white rounded-full text-sm inline-block bg-gray-400">...</div>
                             </div>
+                            <div id="weather-animation-container" class="relative h-24 my-2 overflow-hidden rounded-lg">
+                                <div id="weather-animation"></div>
+                            </div>
+                            <p id="weather-description" class="text-center text-lg capitalize mb-2"></p>
                             <div class="mt-4 grid grid-cols-3 gap-2 text-center">
                                 <div><p class="text-xs text-gray-500" data-lang-key="dataPanelTemp">Temp</p><p id="temp-value" class="font-bold text-lg">--°C</p></div>
                                 <div><p class="text-xs text-gray-500" data-lang-key="dataPanelHumidity">Humidity</p><p id="humidity-value" class="font-bold text-lg">--%</p></div>
@@ -1138,6 +1179,8 @@
                 const updateTimeEl = document.getElementById('update-time');
                 const aqiValueEl = document.getElementById('aqi-value');
                 const aqiStatusEl = document.getElementById('aqi-status');
+                const weatherAnimationEl = document.getElementById('weather-animation');
+                const weatherDescriptionEl = document.getElementById('weather-description');
                 const tempValueEl = document.getElementById('temp-value');
                 const humidityValueEl = document.getElementById('humidity-value');
                 const windValueEl = document.getElementById('wind-value');
@@ -1211,6 +1254,47 @@
                     if (!response.ok) throw new Error('Could not fetch weather data.');
                     return await response.json();
                 };
+
+                const updateWeatherAnimation = (weatherId) => {
+                    weatherAnimationEl.innerHTML = ''; // Clear previous animation
+                    if (weatherId === 800) { // Clear
+                        weatherAnimationEl.innerHTML = '<div class="sun"></div>';
+                    } else if (weatherId >= 801 && weatherId <= 804) { // Clouds
+                        weatherAnimationEl.innerHTML = '<div class="cloud"></div><div class="cloud c2"></div>';
+                    } else if ((weatherId >= 300 && weatherId <= 321) || (weatherId >= 500 && weatherId <= 531)) { // Drizzle & Rain
+                        let rainHTML = '<div class="cloud"></div><div class="rain">';
+                        for(let i=0; i<20; i++) {
+                            const left = Math.random() * 100;
+                            const delay = Math.random() * 2;
+                            rainHTML += `<div style="left: ${left}%; animation-delay: ${delay}s;"></div>`;
+                        }
+                        rainHTML += '</div>';
+                        weatherAnimationEl.innerHTML = rainHTML;
+                    } else if (weatherId >= 200 && weatherId <= 232) { // Thunderstorm
+                         let rainHTML = '<div class="cloud" style="background: #888;"></div><div class="thunder"></div><div class="rain">';
+                        for(let i=0; i<20; i++) {
+                            const left = Math.random() * 100;
+                            const delay = Math.random() * 2;
+                            rainHTML += `<div style="left: ${left}%; animation-delay: ${delay}s;"></div>`;
+                        }
+                        rainHTML += '</div>';
+                        weatherAnimationEl.innerHTML = rainHTML;
+                    } else if (weatherId >= 600 && weatherId <= 622) { // Snow
+                        let snowHTML = '<div class="cloud"></div><div class="snow">';
+                        for(let i=0; i<20; i++) {
+                            const left = Math.random() * 100;
+                            const delay = Math.random() * 5;
+                             const duration = (Math.random() * 3) + 4; // 4 to 7 seconds
+                            snowHTML += `<div style="left: ${left}%; animation-delay: ${delay}s; animation-duration: ${duration}s;"></div>`;
+                        }
+                        snowHTML += '</div>';
+                        weatherAnimationEl.innerHTML = snowHTML;
+                    } else if (weatherId >= 701 && weatherId <= 781) { // Mist, Fog, etc.
+                        weatherAnimationEl.innerHTML = '<div class="mist"><div class="m1"></div><div class="m2"></div></div>';
+                    } else {
+                         weatherAnimationEl.innerHTML = '<div class="cloud"></div>'; // Default to cloudy
+                    }
+                };
                 
                 const getAqiStatus = (aqi) => {
                      if (aqi <= 50) return { statusKey: "aqiStatusGood", adviceKey: "aqiAdviceGood", color: "#22c55e" };
@@ -1244,6 +1328,11 @@
                         handleError(translations[currentLang].aqiError);
                     }
 
+                    if (weatherData && weatherData.weather) {
+                        updateWeatherAnimation(weatherData.weather[0].id);
+                        weatherDescriptionEl.textContent = weatherData.weather[0].description;
+                    }
+
                     if (weatherData && weatherData.main) {
                         tempValueEl.textContent = `${Math.round(weatherData.main.temp)}°C`;
                         humidityValueEl.textContent = `${weatherData.main.humidity}%`;
@@ -1261,6 +1350,8 @@
                     aqiStatusEl.textContent = translations[currentLang].aqiStatusNoData;
                     aqiStatusEl.style.backgroundColor = "#9ca3af";
                     forecastTextEl.textContent = message;
+                    weatherDescriptionEl.textContent = "";
+                    weatherAnimationEl.innerHTML = "";
                     loadingDiv.classList.add('hidden');
                     dataContentDiv.classList.remove('hidden');
                 };
@@ -1292,4 +1383,3 @@
     </script>
 </body>
 </html>
-
