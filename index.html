@@ -447,6 +447,7 @@
                 dataPanelHumidity: "Humidity",
                 dataPanelWind: "Wind",
                 dataPanelHealthAdvice: "Health Advice:",
+                updatedLabel: "Updated",
                 footerText: "© 2024 All rights reserved for Digital Minds team",
                 // AQI Statuses and Advice
                 aqiStatusGood: "Good",
@@ -523,11 +524,12 @@
                 advFeature2Desc: "يتم حفظ سجل البحث تلقائيًا في حسابك، مما يتيح لك الوصول إلى أماكنك المتكررة من أي جهاز.",
                 advFeature3Title: "إدارة الحساب",
                 advFeature3Desc: "يمكنك إدارة إعدادات حسابك بسهولة، بما في ذلك القدرة على تغيير كلمة المرور في أي وقت للحفاظ على أمان حسابك.",
-                dataPanelAQI: "مؤشر جودة الهواء (AQI)",
+                dataPanelAQI: "مؤشر جودة الهواء",
                 dataPanelTemp: "الحرارة",
                 dataPanelHumidity: "الرطوبة",
                 dataPanelWind: "الرياح",
                 dataPanelHealthAdvice: "نصيحة صحية:",
+                updatedLabel: "آخر تحديث",
                 footerText: "© 2024 جميع الحقوق محفوظة لفريق Digital Minds",
                  // AQI Statuses and Advice
                 aqiStatusGood: "جيد",
@@ -742,9 +744,18 @@
                         const aqiLabel = translations[currentLang].dataPanelAQI;
                         const aqiValue = document.getElementById('aqi-value').innerText;
                         const aqiStatus = document.getElementById('aqi-status').innerText;
+
+                        const tempLabel = translations[currentLang].dataPanelTemp;
+                        const tempValue = document.getElementById('temp-value').innerText;
+                        const humidityLabel = translations[currentLang].dataPanelHumidity;
+                        const humidityValue = document.getElementById('humidity-value').innerText;
+                        const windLabel = translations[currentLang].dataPanelWind;
+                        const windValue = document.getElementById('wind-value').innerText;
+
                         const adviceLabel = translations[currentLang].dataPanelHealthAdvice;
                         const advice = document.getElementById('forecast-text').innerText;
-                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${adviceLabel}: ${advice}`;
+                        
+                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${tempLabel}: ${tempValue}. ${humidityLabel}: ${humidityValue}. ${windLabel}: ${windValue}. ${adviceLabel}: ${advice}`;
                     } else {
                         textToRead = currentLang === 'ar' ? 'الرجاء تحديد موقع على الخريطة أولاً.' : 'Please select a location on the map first.';
                     }
@@ -1155,15 +1166,18 @@
                     fetchAllDataForLocation(center.lat, center.lng);
                 }).addTo(map);
 
-                // --- DATA FETCHING & UI LOGIC (FIXED) ---
+                // --- DATA FETCHING & UI LOGIC ---
                 const fetchAllDataForLocation = async (lat, lng) => {
+                    speechSynthesis.cancel();
                     dataPanel.classList.remove('hidden');
                     loadingDiv.classList.remove('hidden');
                     dataContentDiv.classList.add('hidden');
                     
+                    const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+
                     const results = await Promise.allSettled([
                         fetchAqiData(lat, lng), 
-                        fetchWeatherData(lat, lng)
+                        fetchWeatherData(lat, lng, currentLang)
                     ]);
 
                     const aqiResult = results[0];
@@ -1176,7 +1190,6 @@
                     if (weatherResult.status === 'rejected') console.error("Weather Fetch Error:", weatherResult.reason);
                     
                     if (!aqiData && !weatherData) {
-                        const currentLang = localStorage.getItem('preferredLanguage') || 'en';
                         handleError(translations[currentLang].fetchError);
                     } else {
                         updateUIPanel({ aqiData, weatherData, lat, lng });
@@ -1192,8 +1205,8 @@
                     return data.data;
                 };
 
-                const fetchWeatherData = async (lat, lng) => {
-                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric`;
+                const fetchWeatherData = async (lat, lng, lang) => {
+                    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${OPENWEATHER_API_KEY}&units=metric&lang=${lang}`;
                     const response = await fetch(url);
                     if (!response.ok) throw new Error('Could not fetch weather data.');
                     return await response.json();
@@ -1210,10 +1223,18 @@
 
                 const updateUIPanel = ({ aqiData, weatherData, lat, lng }) => {
                     const currentLang = localStorage.getItem('preferredLanguage') || 'en';
-                    if (aqiData && aqiData.city) {
-                        currentCityData = { name: aqiData.city.name, lat, lng };
-                        cityNameEl.textContent = aqiData.city.name;
-                        updateTimeEl.textContent = `Updated: ${new Date(aqiData.time.s).toLocaleString()}`;
+                    
+                    cityNameEl.textContent = weatherData?.name || aqiData?.city?.name || 'Unknown Location';
+
+                    if (aqiData && aqiData.time) {
+                        currentCityData = { name: weatherData?.name || aqiData.city.name, lat, lng };
+                        
+                        const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+                        const localizedDate = new Date(aqiData.time.s).toLocaleString(locale, { 
+                            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                        });
+                        updateTimeEl.textContent = `${translations[currentLang].updatedLabel}: ${localizedDate}`;
+                        
                         aqiValueEl.textContent = aqiData.aqi;
                         const { statusKey, adviceKey, color } = getAqiStatus(aqiData.aqi);
                         aqiStatusEl.textContent = translations[currentLang][statusKey];
@@ -1230,7 +1251,6 @@
                     }
                     loadingDiv.classList.add('hidden');
                     dataContentDiv.classList.remove('hidden');
-                    setLanguage(currentLang);
                 };
                 
                 const handleError = (message) => {
@@ -1257,7 +1277,10 @@
                     });
                 });
                 
-                document.getElementById('close-panel-btn').addEventListener('click', () => dataPanel.classList.add('hidden'));
+                document.getElementById('close-panel-btn').addEventListener('click', () => {
+                    speechSynthesis.cancel();
+                    dataPanel.classList.add('hidden');
+                });
                 document.getElementById('locate-btn').addEventListener('click', () => map.locate({setView: true, maxZoom: 13}));
                 map.on('locationfound', (e) => {
                     marker.setLatLng(e.latlng).setOpacity(1);
@@ -1269,3 +1292,4 @@
     </script>
 </body>
 </html>
+
