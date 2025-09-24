@@ -601,6 +601,16 @@
 
             let mapInitialized = false;
             let map = null;
+            let speechVoices = [];
+
+            // --- TEXT-TO-SPEECH VOICE LOADER ---
+            function loadVoices() {
+                speechVoices = speechSynthesis.getVoices();
+            }
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
             
             // --- THEME/DARK MODE LOGIC ---
             const applyTheme = (theme) => {
@@ -745,7 +755,20 @@
                 if (!textToRead.trim()) { return; }
 
                 const utterance = new SpeechSynthesisUtterance(textToRead);
-                utterance.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+                const langCode = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+                const langShortCode = currentLang === 'ar' ? 'ar' : 'en';
+
+                let selectedVoice = speechVoices.find(voice => voice.lang === langCode);
+                if (!selectedVoice) {
+                    selectedVoice = speechVoices.find(voice => voice.lang.startsWith(langShortCode));
+                }
+
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                } else {
+                    utterance.lang = langCode;
+                    console.warn(`TTS voice for '${langCode}' not found. Falling back to browser default.`);
+                }
                 
                 utterance.onstart = () => {
                     readAloudPlayIcon.classList.add('hidden');
