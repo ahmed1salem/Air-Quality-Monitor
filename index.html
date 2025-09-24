@@ -199,6 +199,12 @@
                         <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 15a5 5 0 100-10 5 5 0 000 10zM10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-7-8a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-2.929-5.071a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zm-9.142 9.142a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707.707zm9.142 0a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707zm-9.142-9.142a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
                     </button>
 
+                    <!-- Read Aloud Button -->
+                    <button id="read-aloud-btn" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500" title="Read page content aloud">
+                        <svg id="read-aloud-play-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v14l11-7-11-7z"></path></svg>
+                        <svg id="read-aloud-stop-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h12v12H6z"></path></svg>
+                    </button>
+
                     <!-- Auth Buttons / User Menu -->
                     <div id="auth-container-logged-out" class="flex space-x-2">
                         <button id="login-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm" data-lang-key="navLogin">Login</button>
@@ -589,6 +595,9 @@
             const themeToggleBtn = document.getElementById('theme-toggle');
             const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
             const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+            const readAloudBtn = document.getElementById('read-aloud-btn');
+            const readAloudPlayIcon = document.getElementById('read-aloud-play-icon');
+            const readAloudStopIcon = document.getElementById('read-aloud-stop-icon');
 
             let mapInitialized = false;
             let map = null;
@@ -628,6 +637,7 @@
 
             // --- LANGUAGE SWITCHER LOGIC ---
             const setLanguage = (lang) => {
+                speechSynthesis.cancel();
                 document.documentElement.lang = lang;
                 document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
                 
@@ -684,6 +694,7 @@
 
             // --- VIEW MANAGEMENT ---
             const showLandingPage = () => {
+                speechSynthesis.cancel();
                 landingPage.classList.remove('hidden');
                 mapView.classList.add('hidden');
                 if (window.location.hash === "#map") {
@@ -692,6 +703,7 @@
             };
 
             const showMapView = () => {
+                speechSynthesis.cancel();
                 landingPage.classList.add('hidden');
                 mapView.classList.remove('hidden');
                 if (!mapInitialized) {
@@ -701,6 +713,59 @@
                 setTimeout(() => { if (map) map.invalidateSize(); }, 0);
             };
             
+             // --- TEXT-TO-SPEECH LOGIC ---
+            const handleReadAloud = () => {
+                if (speechSynthesis.speaking) {
+                    speechSynthesis.cancel();
+                    return;
+                }
+
+                let textToRead = '';
+                const isMapView = !mapView.classList.contains('hidden');
+                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+
+                if (isMapView) {
+                    const dataPanel = document.getElementById('data-panel');
+                    const dataContent = document.getElementById('data-content');
+                    if (dataPanel && !dataPanel.classList.contains('hidden') && dataContent && !dataContent.classList.contains('hidden')) {
+                        const city = document.getElementById('city-name').innerText;
+                        const aqiLabel = translations[currentLang].dataPanelAQI;
+                        const aqiValue = document.getElementById('aqi-value').innerText;
+                        const aqiStatus = document.getElementById('aqi-status').innerText;
+                        const adviceLabel = translations[currentLang].dataPanelHealthAdvice;
+                        const advice = document.getElementById('forecast-text').innerText;
+                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${adviceLabel}: ${advice}`;
+                    } else {
+                        textToRead = currentLang === 'ar' ? 'الرجاء تحديد موقع على الخريطة أولاً.' : 'Please select a location on the map first.';
+                    }
+                } else {
+                    textToRead = landingPage.innerText.replace(/\s\s+/g, ' ').trim();
+                }
+
+                if (!textToRead.trim()) { return; }
+
+                const utterance = new SpeechSynthesisUtterance(textToRead);
+                utterance.lang = currentLang === 'ar' ? 'ar-SA' : 'en-US';
+                
+                utterance.onstart = () => {
+                    readAloudPlayIcon.classList.add('hidden');
+                    readAloudStopIcon.classList.remove('hidden');
+                };
+                utterance.onend = () => {
+                    readAloudPlayIcon.classList.remove('hidden');
+                    readAloudStopIcon.classList.add('hidden');
+                };
+                utterance.onerror = (event) => {
+                    console.error('SpeechSynthesisUtterance.onerror', event);
+                    readAloudPlayIcon.classList.remove('hidden');
+                    readAloudStopIcon.classList.add('hidden');
+                };
+                
+                speechSynthesis.speak(utterance);
+            };
+            readAloudBtn.addEventListener('click', handleReadAloud);
+
+
             // --- AUTHENTICATION STATE OBSERVER ---
             onAuthStateChanged(auth, user => {
                 if (user) {
@@ -1181,4 +1246,3 @@
     </script>
 </body>
 </html>
-
