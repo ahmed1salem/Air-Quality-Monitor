@@ -10,13 +10,13 @@
                    script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com https://unpkg.com https://www.gstatic.com https://cdn.jsdelivr.net; 
                    style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com; 
                    font-src 'self' https://fonts.gstatic.com; 
-                   img-src 'self' https: data: blob: https://raw.githubusercontent.com;
+                   img-src 'self' https: data: blob: https://raw.githubusercontent.com https://placehold.co https://i.ibb.co;
                    connect-src 'self' https://*.firebaseio.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com https://fcmtoken.googleapis.com https://api.waqi.info https://api.openweathermap.org https://api.openaq.org https://gibs.earthdata.nasa.gov https://www.google-analytics.com https://firebaseinstallations.googleapis.com;">
 
-    <title>Air Quality Monitor - Live AQI & Pollution Map by Ahmed Salem</title>
-    <meta name="description" content="Track real-time air quality and pollution levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by Ahmed Salem.">
-    <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, ahmed salem, web developer, portfolio">
-    <meta name="author" content="Ahmed Salem">
+    <title>Air Quality Monitor - Live AQI & Pollution Map by Digital Minds</title>
+    <meta name="description" content="Track real-time air quality and weather levels anywhere in the world. Get live AQI data, weather updates, and health recommendations with our interactive map, developed by the Digital Minds team.">
+    <meta name="keywords" content="air quality, aqi, pollution, live map, air quality index, weather, real-time data, digital minds, web developer, portfolio">
+    <meta name="author" content="Digital Minds">
     <link rel="canonical" href="https://air-quality-monitor-3.netlify.app" />
 
     <!-- Favicon -->
@@ -32,18 +32,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-    <!-- Import Map for Three.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
-
     <style>
         :root { --font-primary: 'Inter', sans-serif; --font-secondary: 'Cairo', sans-serif; }
+        html { scroll-behavior: smooth; }
         body { background-color: #f8fafc; color: #1f2937; scroll-behavior: smooth; overflow-x: hidden; transition: background-color 0.3s, color 0.3s; }
         .lang-en { font-family: var(--font-primary); }
         .lang-ar { font-family: var(--font-secondary); }
@@ -57,73 +48,67 @@
         #history-list li { cursor: pointer; transition: background-color: 0.2s; }
         #history-list li:hover { background-color: #f3f4f6; }
         
-        .leaflet-control-container .leaflet-top {
-            top: 80px; 
-        }
-        @media (max-width: 640px) {
-            .leaflet-control-container .leaflet-top {
-                top: 130px; /* More space for wrapped header */
-            }
-        }
+        .leaflet-control-container .leaflet-top { top: 80px; }
+        @media (max-width: 640px) { .leaflet-control-container .leaflet-top { top: 90px; } }
         
-        /* --- Dark Mode Styles --- */
-        .dark body { background-color: #000000; color: #e8e8e8; }
-        .dark .bg-white { background-color: #121212; }
-        .dark .bg-gray-50 { background-color: #000000; }
-        .dark .text-gray-800 { color: #ffffff; }
-        .dark .text-gray-600 { color: #a0a0a0; }
-        .dark .text-gray-700 { color: #e8e8e8; }
-        .dark .text-gray-500 { color: #888888; }
-        .dark .border, .dark .border-b { border-color: #333333; }
-        .dark .shadow-xl, .dark .shadow-lg, .dark .shadow-md { box-shadow: 0 10px 15px -3px rgba(0,0,0,.5), 0 4px 6px -2px rgba(0,0,0,.4); }
-        .dark .hero-bg { background-color: #000000; background-image: radial-gradient(circle at 1px 1px, #444 1px, transparent 0); background-size: 25px 25px; }
-        .dark #history-list li:hover { background-color: #2a2a2a; }
-        .dark .leaflet-control-geocoder a, .dark .leaflet-control-zoom a, .dark #locate-btn { background-color: #121212; color: #ffffff; border: 1px solid #333333; }
-        .dark .leaflet-control-geocoder, .dark .leaflet-control-zoom { border: 1px solid #333333; }
-        .dark .leaflet-control-geocoder-form input { background-color: #2a2a2a; color: #ffffff; }
-        .dark #data-panel { background-color: rgba(18, 18, 18, 0.9); }
-        .dark .bg-gray-100 { background-color: #2a2a2a; }
-        .dark .hover\:bg-gray-100:hover { background-color: #2a2a2a !important; }
-        .dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+        /* --- Sidebar Styles --- */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        #sidebar-overlay { transition: opacity 0.3s ease-in-out; }
+        .sidebar-open #sidebar { transform: translateX(0); }
+        .sidebar-open #sidebar-overlay { opacity: 1; pointer-events: auto; }
 
+        /* --- Dark Mode Styles --- */
+        .dark body { background-color: #0f172a; color: #e2e8f0; }
+        .dark .bg-white { background-color: #1e293b; }
+        .dark .bg-gray-50 { background-color: #0f172a; }
+        .dark .text-gray-800 { color: #ffffff; }
+        .dark .text-gray-900 { color: #ffffff; }
+        .dark .text-gray-600 { color: #94a3b8; }
+        .dark .text-gray-700 { color: #cbd5e1; }
+        .dark .text-gray-500 { color: #64748b; }
+        .dark .border, .dark .border-b, .dark .border-t { border-color: #334155; }
+        .dark .shadow-xl, .dark .shadow-lg, .dark .shadow-md { box-shadow: 0 10px 15px -3px rgba(0,0,0,.5), 0 4px 6px -2px rgba(0,0,0,.4); }
+        .dark .hero-bg { background-color: #020617; background-image: radial-gradient(circle at 1px 1px, #334155 1px, transparent 0); background-size: 25px 25px; }
+        .dark #history-list li:hover { background-color: #334155; }
+        .dark .leaflet-control-geocoder a, .dark .leaflet-control-zoom a, .dark #locate-btn { background-color: #1e293b; color: #ffffff; border: 1px solid #334155; }
+        .dark .leaflet-control-geocoder, .dark .leaflet-control-zoom { border: 1px solid #334155; }
+        .dark .leaflet-control-geocoder-form input { background-color: #334155; color: #ffffff; }
+        .dark #data-panel { background-color: rgba(30, 41, 59, 0.9); }
+        .dark .bg-gray-100 { background-color: #334155; }
+        .dark .hover\:bg-gray-100:hover { background-color: #334155 !important; }
+        .dark .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.95) contrast(0.9); }
+        
         /* --- Weather Animation Styles --- */
         #weather-animation-container { background: linear-gradient(to bottom, #87CEEB, #B0E0E6); transition: background 0.5s; }
         .dark #weather-animation-container { background: linear-gradient(to bottom, #0c1445, #2d3748); }
         #weather-animation { position: relative; width: 100%; height: 100%; }
         .sun, .cloud, .rain, .snow, .mist, .thunder { position: absolute; }
-
-        /* Sun */
         .sun { top: 15%; left: 50%; width: 40px; height: 40px; background: #FFD700; border-radius: 50%; transform: translateX(-50%); box-shadow: 0 0 20px #FFD700; }
-
-        /* Clouds */
         .cloud { background: #fff; border-radius: 50%; width: 60px; height: 60px; top: 30%; left: -80px; animation: move-cloud 15s linear infinite; box-shadow: 0 0 15px rgba(0,0,0,0.2); }
         .cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
         .cloud::before { width: 40px; height: 40px; top: -20px; right: 10px; }
         .cloud::after { width: 50px; height: 50px; top: -10px; left: 5px; }
         .cloud.c2 { animation-delay: -5s; top: 45%; transform: scale(0.8); }
         @keyframes move-cloud { 0% { left: -80px; } 100% { left: 110%; } }
-
-        /* Rain */
         .rain { left: 0; top: 0; width: 100%; height: 100%; }
         .rain > div { position: absolute; width: 2px; height: 10px; background: #77aadd; animation: fall 1s linear infinite; }
         @keyframes fall { 0% { transform: translateY(-20px); } 100% { transform: translateY(120px); } }
-
-        /* Snow */
         .snow > div { position: absolute; width: 5px; height: 5px; background: #fff; border-radius: 50%; animation: snowfall 5s linear infinite; }
         @keyframes snowfall { 0% { transform: translateY(-20px) translateX(0); } 100% { transform: translateY(120px) translateX(20px); } }
-
-        /* Mist */
         .mist > div { position: absolute; width: 120%; height: 30px; background: rgba(255,255,255,0.4); border-radius: 15px; bottom: 0; left: -10%; animation: move-mist 10s linear infinite alternate; }
         .mist > div.m2 { animation-delay: -5s; opacity: 0.7; }
         @keyframes move-mist { from { transform: translateX(-20px); } to { transform: translateX(20px); } }
-
-        /* Thunderstorm */
         .thunder { width: 100%; height: 100%; background: rgba(255, 255, 0, 0.3); opacity: 0; animation: lightning 3s linear infinite; }
         @keyframes lightning { 0%, 100% { opacity: 0; } 50% { opacity: 1; } 52% { opacity: 0; } 55% { opacity: 1; } 56% { opacity: 0; } }
 
-        /* Globe Styles */
-        #globe-container { cursor: grab; }
-        #globe-container canvas { display: block; width: 100%; height: 100%; }
+        .talkback-highlight { background-color: rgba(59, 130, 246, 0.4); }
+
+        /* Scroll Animations */
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        .team-card { transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+        .team-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .dark .team-card:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,.5), 0 4px 6px -2px rgba(0,0,0,.4); }
     </style>
 </head>
 <body class="text-gray-800">
@@ -224,60 +209,68 @@
             </div>
         </div>
     </div>
+    
+    <!-- Sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 opacity-0 pointer-events-none"></div>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 shadow-lg z-40 transform -translate-x-full p-6">
+        <button id="close-sidebar-btn" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-white text-2xl">&times;</button>
+        <div class="mt-8 space-y-4">
+            <!-- Auth Buttons / User Menu -->
+            <div id="sidebar-auth-logged-out" class="space-y-2">
+                <button id="login-btn-sidebar" class="w-full bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-gray-600" data-lang-key="navLogin">Login</button>
+                <button id="signup-btn-sidebar" class="w-full bg-blue-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-blue-700" data-lang-key="navSignup">Sign Up</button>
+            </div>
+            <div id="sidebar-auth-logged-in" class="hidden">
+                 <h3 class="font-bold text-lg" id="sidebar-user-name"></h3>
+                 <a href="#" id="edit-profile-btn-sidebar" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500" data-lang-key="menuEditProfile">Edit Profile</a>
+                 <a href="#" id="history-btn-sidebar" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500" data-lang-key="menuHistory">Search History</a>
+                 <a href="#" id="change-password-btn-sidebar" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500" data-lang-key="menuChangePassword">Change Password</a>
+                 <a href="#" id="logout-btn-sidebar" class="block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500" data-lang-key="menuLogout">Logout</a>
+            </div>
+             <hr class="dark:border-gray-700">
+             <!-- Navigation Links -->
+             <a href="#team" class="sidebar-link block py-2 text-gray-700 dark:text-gray-300 hover:text-blue-500" data-lang-key="navTeam">Our Team</a>
+             <hr class="dark:border-gray-700">
+            <!-- Settings -->
+            <div class="space-y-4">
+                 <h3 class="font-bold text-lg text-gray-900 dark:text-white" data-lang-key="navSettings">Settings</h3>
+                 <div class="flex items-center justify-between">
+                     <span class="text-gray-700 dark:text-gray-300" data-lang-key="navLanguage">Language</span>
+                     <div class="flex space-x-1">
+                         <button id="lang-en-sidebar" class="font-semibold text-sm py-1 px-2 rounded">EN</button>
+                         <button id="lang-ar-sidebar" class="font-semibold text-sm py-1 px-2 rounded">AR</button>
+                     </div>
+                 </div>
+                 <div class="flex items-center justify-between">
+                     <span class="text-gray-700 dark:text-gray-300" data-lang-key="navTheme">Theme</span>
+                     <button id="theme-toggle-sidebar" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"></button>
+                 </div>
+                 <div class="flex items-center justify-between">
+                     <label for="talkback-toggle" class="text-gray-700 dark:text-gray-300" data-lang-key="navTalkback">Read on Hover</label>
+                     <input type="checkbox" id="talkback-toggle" class="form-checkbox h-5 w-5 text-blue-600">
+                 </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Main Content -->
     <div id="main-content">
         <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-20">
-            <!-- Responsive Header -->
-            <nav class="container mx-auto px-4 py-4 flex flex-wrap justify-between items-center">
+            <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
                 <a href="#" id="home-logo-link" class="flex items-center space-x-2">
                      <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjk7K0IOVXn7WvuM8wl4rXWpCAvvMG8mUjenuSlZsBh6iUeoH8SlHd-dzzCdnIoSxHr6atY7R8fQKji1gIeZ282QhKL-QbXSEUaayoYuxFdtWtogbLhcBOwBAKWuKcolUYEzDxDd8xkgjP-ZSIsIS1DsSx_50DhHDoUp8LVN1hDsy-jHCJxn4vbPnoKnYE/s1260/favicon.png" alt="Logo" class="h-8 w-8">
                      <h1 class="text-lg sm:text-xl font-bold text-white" data-lang-key="appName">Air Quality Monitor</h1>
                 </a>
-                <div class="flex items-center space-x-2 sm:space-x-4 mt-4 sm:mt-0 w-full sm:w-auto justify-center sm:justify-end">
-                    <!-- Language Switcher -->
-                    <div class="flex space-x-2">
-                        <button id="lang-en" class="text-white font-semibold text-sm py-1 px-2 rounded bg-gray-700">EN</button>
-                        <button id="lang-ar" class="text-gray-400 font-semibold text-sm py-1 px-2 rounded hover:bg-gray-700">AR</button>
-                    </div>
-
-                    <!-- Theme Switcher -->
-                    <button id="theme-toggle" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500">
-                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 15a5 5 0 100-10 5 5 0 000 10zM10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-7-8a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-2.929-5.071a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zm-9.142 9.142a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707.707zm9.142 0a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707zm-9.142-9.142a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
-                    </button>
-
-                    <!-- Read Aloud Button -->
-                    <button id="read-aloud-btn" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500" title="Read page content aloud">
-                        <svg id="read-aloud-play-icon" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5.14v14l11-7-11-7z"></path></svg>
-                        <svg id="read-aloud-stop-icon" class="hidden w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h12v12H6z"></path></svg>
-                    </button>
-
-                    <!-- Auth Buttons / User Menu -->
-                    <div id="auth-container-logged-out" class="flex space-x-2">
-                        <button id="login-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm" data-lang-key="navLogin">Login</button>
-                        <button id="signup-btn" class="bg-blue-600 text-white px-3 py-2 rounded-lg font-semibold hover:bg-blue-700 text-sm" data-lang-key="navSignup">Sign Up</button>
-                    </div>
-                    <div id="auth-container-logged-in" class="hidden relative">
-                        <button id="user-menu-btn" class="bg-gray-700 text-white px-3 py-2 rounded-lg font-semibold hover:bg-gray-600 text-sm flex items-center">
-                            <span id="user-name-display" class="truncate max-w-[100px] sm:max-w-xs"></span>
-                            <svg class="w-4 h-4 ml-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-30 hidden">
-                            <a href="#" id="edit-profile-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuEditProfile">Edit Profile</a>
-                            <a href="#" id="history-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuHistory">Search History</a>
-                            <a href="#" id="change-password-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuChangePassword">Change Password</a>
-                            <a href="#" id="logout-btn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-lang-key="menuLogout">Logout</a>
-                        </div>
-                    </div>
-                </div>
+                <button id="menu-btn" class="text-white p-2 rounded-lg hover:bg-gray-700">
+                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </nav>
         </header>
 
-        <!-- Landing Page Section -->
+        <!-- Landing Page View -->
         <div id="landing-page">
-             <!-- Added padding-top to account for the taller header -->
-            <section class="hero-bg text-white pt-48 sm:pt-32 pb-20 text-center">
+            <section class="hero-bg text-white pt-48 sm:pt-32 pb-20 text-center animate-on-scroll">
                 <div class="container mx-auto px-4">
                     <h2 class="text-3xl sm:text-4xl md:text-6xl font-extrabold mb-4 leading-tight" data-lang-key="heroTitle">Breathe Clearer. Live Better.</h2>
                     <p class="text-base sm:text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto" data-lang-key="heroSubtitle">Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.</p>
@@ -285,27 +278,15 @@
                 </div>
             </section>
             
-            <!-- Interactive Globe Section -->
-            <section id="globe-section" class="py-20 bg-gray-50 text-center">
-                <div class="container mx-auto px-4">
-                    <h2 class="text-3xl md:text-4xl font-bold" data-lang-key="globeTitle">Our Planet, Our Future</h2>
-                    <p class="text-gray-600 mt-4 max-w-3xl mx-auto" data-lang-key="globeSubtitle">An interactive look at Earth, reminding us of what we're protecting.</p>
-                    <div id="globe-container" class="w-full max-w-2xl mx-auto h-80 sm:h-96 mt-8 rounded-lg"></div>
-                </div>
-            </section>
-
-
-            <!-- NEW Detailed Features Section -->
             <section id="about-features" class="py-20 bg-white">
                 <div class="container mx-auto px-4">
-                    <div class="text-center mb-16">
+                    <div class="text-center mb-16 animate-on-scroll">
                         <h2 class="text-3xl md:text-4xl font-bold" data-lang-key="aboutTitle">A Comprehensive Tool for Your Well-being</h2>
                         <p class="text-gray-600 mt-4 max-w-3xl mx-auto" data-lang-key="aboutSubtitle">We combine air quality, weather data, and personalized features to give you a complete picture of your environment.</p>
                     </div>
             
                     <div class="space-y-16">
-                        <!-- Feature 1: Interactive Map -->
-                        <div class="flex flex-wrap items-center">
+                        <div class="flex flex-wrap items-center animate-on-scroll">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
                                 <div class="p-3 text-blue-600 bg-blue-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -318,8 +299,7 @@
                             </div>
                         </div>
 
-                        <!-- Feature 2: Detailed Data Panel -->
-                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse">
+                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse animate-on-scroll">
                             <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8 mt-8 md:mt-0">
                                 <div class="p-3 text-green-600 bg-green-100 rounded-full inline-block mb-4">
                                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -331,66 +311,25 @@
                                 <img src="https://blogger.googleusercontent.com/img/a/AVvXsEik6YyOCHbuvpICg9Ps2SQIUJVYrTNaB1aPbVILr79xK87h5qLCL-9zyAuQvzrVPVZQcc0s9v2OGyhp1cMJx1jfQ8HkKE0M_1DtACaCud51rj-FNBhhmLxZQedEOX-hkEnI_87XOKSnRWclh5lFcw3OH-pnioaE5vp973_JIi3Cyuhru5FwUhyZE-E8gT8" alt="Weather dashboard" class="rounded-lg shadow-xl">
                             </div>
                         </div>
-                        
-                        <!-- Feature 3: Search -->
-                        <div class="flex flex-wrap items-center">
-                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pr-8">
-                                <div class="p-3 text-purple-600 bg-purple-100 rounded-full inline-block mb-4">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                </div>
-                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature3Title">Accurate Global Search</h3>
-                                <p class="text-gray-600" data-lang-key="feature3Desc">Can't find a place by clicking? Use our powerful search bar. Just type the name of any city or region, in English or Arabic, and the map will instantly take you there, providing the data you need.</p>
-                            </div>
-                            <div class="w-full md:w-1/2 lg:w-7/12 mt-8 md:mt-0">
-                                <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Person searching on a map" class="rounded-lg shadow-xl">
-                            </div>
-                        </div>
-                        
-                        <!-- Feature 4: Health Advice -->
-                         <div class="flex flex-wrap items-center flex-col-reverse md:flex-row-reverse">
-                            <div class="w-full md:w-1/2 lg:w-5/12 px-4 md:pl-8 mt-8 md:mt-0">
-                                <div class="p-3 text-red-600 bg-red-100 rounded-full inline-block mb-4">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                                </div>
-                                <h3 class="text-2xl font-bold mb-3" data-lang-key="feature4Title">Personalized Health Advice</h3>
-                                <p class="text-gray-600" data-lang-key="feature4Desc">Based on the AQI level, we provide clear and simple health recommendations. Know when it's safe to exercise outdoors and when it's better for you and your family to stay inside.</p>
-                            </div>
-                            <div class="w-full md:w-1/2 lg:w-7/12">
-                                <img src="https://images.unsplash.com/photo-1556740758-90de374c12ad?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Person checking phone for health info" class="rounded-lg shadow-xl">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
-
-
-            <!-- Advanced Features Section -->
-            <section id="advanced-features" class="bg-gray-50 py-20">
-                <div class="container mx-auto px-4 text-center">
-                      <div>
-                         <h3 class="text-3xl font-bold mb-2" data-lang-key="advFeaturesTitle">Advanced Account Features</h3>
-                         <p class="text-gray-600 mb-12" data-lang-key="advFeaturesSubtitle">Get more out of the monitor with a free account.</p>
-                       </div>
-                       <div class="grid md:grid-cols-3 gap-8">
-                           <div class="p-6 bg-white rounded-lg shadow-md">
-                                <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                 <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature1Title">Secure Accounts</h4>
-                                 <p class="text-gray-600" data-lang-key="advFeature1Desc">Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.</p>
-                           </div>
-                           <div class="p-6 bg-white rounded-lg shadow-md">
-                                <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                 <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature2Title">Cloud History</h4>
-                                 <p class="text-gray-600" data-lang-key="advFeature2Desc">Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.</p>
-                           </div>
-                           <div class="p-6 bg-white rounded-lg shadow-md">
-                                <svg class="w-12 h-12 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                 <h4 class="text-xl font-bold mb-2" data-lang-key="advFeature3Title">Account Management</h4>
-                                 <p class="text-gray-600" data-lang-key="advFeature3Desc">Easily manage your account settings, including the ability to change your password at any time to keep your account secure.</p>
-                           </div>
-                       </div>
+        </div>
+        
+        <!-- Page Content Views (Team) -->
+        <div id="page-content" class="hidden pt-20">
+            <!-- Team Section -->
+            <section id="team-page" class="hidden py-12 bg-white">
+                <div class="container mx-auto px-4">
+                    <div class="text-center mb-16 animate-on-scroll">
+                        <h2 class="text-3xl md:text-4xl font-bold" data-lang-key="teamTitle">Meet Our Team</h2>
+                        <p class="text-lg text-gray-500 mt-2 italic" data-lang-key="teamSlogan">Together, we build solutions for a better tomorrow.</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                        <!-- Team Member Cards will be injected here -->
+                    </div>
                 </div>
             </section>
-            
         </div>
 
         <!-- Map & App Section (Initially Hidden) -->
@@ -439,10 +378,16 @@
             getDocs, 
             serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-        
-        // Import Three.js
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- TEAM DATA ---
+        const teamMembers = [
+            { name: "Ahmed Salem Khalifa", role: "Team Lead & LLM Specialist", desc: "Responsible for the overall project vision, managing the development timeline, and coordinating the team's tasks. His expertise as an LLM Specialist will guide any future integrations of AI-powered features.", img: "https://i.ibb.co/RGtFVr0L/IMG-20241204-WA0010-Copy.jpg" },
+            { name: "Roqaya Mohamed Ahmed", role: "Business Strategist & Frontend Developer", desc: "Responsible for aligning the project with market needs and developing the business strategy. She will also contribute to frontend development, focusing on a user-friendly interface.", img: "https://i.ibb.co/VZpYzy3/Whats-App-Image-2025-09-26-at-15-55-43-eed85144.jpg" },
+            { name: "Ahmed Essam Wagdy", role: "Frontend Developer & Researcher", desc: "Responsible for implementing core features like the interactive map and API integrations. His research skills are crucial for finding the best technical solutions.", img: "https://i.ibb.co/rKYQGD4k/Whats-App-Image-2025-09-26-at-1-11-41-AM.jpg" },
+            { name: "Loay Ahmed Abo El-Maty", role: "Frontend Developer & Researcher", desc: "Responsible for developing features such as the animated weather graphics. He will also conduct research to support the technical implementation.", img: "https://i.ibb.co/39htsQ0s/Whats-App-Image-2025-09-24-at-11-41-20-PM.jpg" },
+            { name: "Ziad Mohamed Hamdy", role: "Social Media Specialist", desc: "Responsible for managing the project's public presence and communication strategy. He will handle social media updates and community engagement to build awareness.", img: "https://i.ibb.co/mC62Nmx9/Whats-App-Image-2025-09-26-at-6-59-23-PM.jpg" },
+        ];
+
 
         // --- TRANSLATIONS OBJECT ---
         const translations = {
@@ -450,11 +395,16 @@
                 appName: "Air Quality Monitor",
                 navLogin: "Login",
                 navSignup: "Sign Up",
+                navTeam: "Our Team",
+                navSettings: "Settings",
+                navLanguage: "Language",
+                navTheme: "Theme",
+                navTalkback: "Read on Hover",
                 heroTitle: "Breathe Clearer. Live Better.",
                 heroSubtitle: "Your real-time guide to the air you breathe. We provide live, accurate air quality data to help you make healthier decisions every day.",
                 heroButton: "Launch Live Map",
-                globeTitle: "Our Planet, Our Future",
-                globeSubtitle: "An interactive look at Earth, reminding us of what we're protecting.",
+                teamTitle: "Meet Our Team",
+                teamSlogan: "Together, we build solutions for a better tomorrow.",
                 namePlaceholder: "Full Name",
                 emailPlaceholder: "Email",
                 passwordPlaceholder: "Password",
@@ -494,18 +444,6 @@
                 feature1Desc: "Our core feature is a dynamic world map. Click anywhere to get instant, real-time Air Quality Index (AQI) data from the nearest monitoring station. Track pollution levels in your city or anywhere you plan to travel.",
                 feature2Title: "Detailed Data & Weather",
                 feature2Desc: "Beyond the AQI number, our detailed panel shows you crucial weather information like temperature, humidity, and wind speed. This helps you understand how weather conditions affect air quality.",
-                feature3Title: "Accurate Global Search",
-                feature3Desc: "Can't find a place by clicking? Use our powerful search bar. Just type the name of any city or region, in English or Arabic, and the map will instantly take you there, providing the data you need.",
-                feature4Title: "Personalized Health Advice",
-                feature4Desc: "Based on the AQI level, we provide clear and simple health recommendations. Know when it's safe to exercise outdoors and when it's better for you and your family to stay inside.",
-                advFeaturesTitle: "Advanced Account Features",
-                advFeaturesSubtitle: "Get more out of the monitor with a free account.",
-                advFeature1Title: "Secure Accounts",
-                advFeature1Desc: "Create a free and secure account to manage your experience. Your data is protected using industry-standard security practices.",
-                advFeature2Title: "Cloud History",
-                advFeature2Desc: "Your search history is automatically saved to your account, allowing you to access your frequent locations from any device.",
-                advFeature3Title: "Account Management",
-                advFeature3Desc: "Easily manage your account settings, including the ability to change your password at any time to keep your account secure.",
                 dataPanelAQI: "Air Quality Index (AQI)",
                 dataPanelTemp: "Temp",
                 dataPanelHumidity: "Humidity",
@@ -513,7 +451,6 @@
                 dataPanelHealthAdvice: "Health Advice:",
                 updatedLabel: "Updated",
                 footerText: "© 2024 All rights reserved for Digital Minds team",
-                // AQI Statuses and Advice
                 aqiStatusGood: "Good",
                 aqiAdviceGood: "Air quality is excellent. Great day to be active outside!",
                 aqiStatusModerate: "Moderate",
@@ -535,11 +472,16 @@
                 appName: "مراقب جودة الهواء",
                 navLogin: "تسجيل الدخول",
                 navSignup: "حساب جديد",
+                navTeam: "فريقنا",
+                navSettings: "الإعدادات",
+                navLanguage: "اللغة",
+                navTheme: "المظهر",
+                navTalkback: "القراءة عند المرور",
                 heroTitle: "تنفس أنقى. عش أفضل.",
                 heroSubtitle: "دليلك الفوري لجودة الهواء الذي تتنفسه. نحن نقدم بيانات دقيقة ومباشرة لمساعدتك على اتخاذ قرارات صحية كل يوم.",
                 heroButton: "افتح الخريطة المباشرة",
-                globeTitle: "كوكبنا، مستقبلنا",
-                globeSubtitle: "نظرة تفاعلية على كوكب الأرض، لتذكيرنا بما يجب أن نحميه.",
+                teamTitle: "تعرف على فريقنا",
+                teamSlogan: "معًا، نبني حلولًا من أجل غد أفضل.",
                 namePlaceholder: "الاسم الكامل",
                 emailPlaceholder: "البريد الإلكتروني",
                 passwordPlaceholder: "كلمة المرور",
@@ -578,18 +520,6 @@
                 feature1Desc: "ميزتنا الأساسية هي خريطة عالمية ديناميكية. انقر في أي مكان للحصول على بيانات مؤشر جودة الهواء (AQI) الفورية في الوقت الفعلي من أقرب محطة مراقبة. تتبع مستويات التلوث في مدينتك أو أي مكان تخطط للسفر إليه.",
                 feature2Title: "بيانات مفصلة والطقس",
                 feature2Desc: "إلى جانب رقم مؤشر جودة الهواء، تعرض لك لوحة البيانات التفصيلية معلومات الطقس الهامة مثل درجة الحرارة والرطوبة وسرعة الرياح. يساعدك هذا على فهم كيفية تأثير الظروف الجوية على جودة الهواء.",
-                feature3Title: "بحث عالمي دقيق",
-                feature3Desc: "لا يمكنك العثور على مكان بالنقر؟ استخدم شريط البحث القوي الخاص بنا. فقط اكتب اسم أي مدينة أو منطقة، باللغة الإنجليزية أو العربية، وستأخذك الخريطة على الفور إلى هناك، مع توفير البيانات التي تحتاجها.",
-                feature4Title: "نصائح صحية مخصصة",
-                feature4Desc: "بناءً على مستوى مؤشر جودة الهواء، نقدم توصيات صحية واضحة وبسيطة. اعرف متى يكون من الآمن ممارسة الرياضة في الهواء الطلق ومتى يكون من الأفضل لك ولعائلتك البقاء في الداخل.",
-                advFeaturesTitle: "ميزات متقدمة لحسابك",
-                advFeaturesSubtitle: "احصل على المزيد من الميزات عند إنشاء حساب مجاني.",
-                advFeature1Title: "حسابات آمنة",
-                advFeature1Desc: "أنشئ حسابًا مجانيًا وآمنًا لإدارة تجربتك. بياناتك محمية باستخدام أفضل معايير الأمان.",
-                advFeature2Title: "سجل سحابي",
-                advFeature2Desc: "يتم حفظ سجل البحث تلقائيًا في حسابك، مما يتيح لك الوصول إلى أماكنك المتكررة من أي جهاز.",
-                advFeature3Title: "إدارة الحساب",
-                advFeature3Desc: "يمكنك إدارة إعدادات حسابك بسهولة، بما في ذلك القدرة على تغيير كلمة المرور في أي وقت للحفاظ على أمان حسابك.",
                 dataPanelAQI: "مؤشر جودة الهواء",
                 dataPanelTemp: "الحرارة",
                 dataPanelHumidity: "الرطوبة",
@@ -597,7 +527,6 @@
                 dataPanelHealthAdvice: "نصيحة صحية:",
                 updatedLabel: "آخر تحديث",
                 footerText: "© 2024 جميع الحقوق محفوظة لفريق Digital Minds",
-                 // AQI Statuses and Advice
                 aqiStatusGood: "جيد",
                 aqiAdviceGood: "جودة الهواء ممتازة. يوم رائع للنشاط في الخارج!",
                 aqiStatusModerate: "متوسط",
@@ -607,7 +536,7 @@
                 aqiStatusUnhealthy: "غير صحي",
                 aqiAdviceUnhealthy: "يجب على الجميع تقليل المجهود الشاق في الهواء الطلق.",
                 aqiStatusVeryUnhealthy: "غير صحي للغاية",
-                aqiAdviceVeryUnhealthy: "تنبيه صحي: تجنب כל الأنشطة البدنية في الهواء الطلق.",
+                aqiAdviceVeryUnhealthy: "تنبيه صحي: تجنب كل الأنشطة البدنية في الهواء الطلق.",
                 aqiStatusHazardous: "خطير",
                 aqiAdviceHazardous: "تحذير صحي: يجب على الجميع البقاء في الداخل.",
                 aqiStatusNoData: "لا توجد بيانات",
@@ -638,15 +567,17 @@
             
             // --- UI ELEMENTS ---
             const landingPage = document.getElementById('landing-page');
+            const pageContent = document.getElementById('page-content');
+            const teamPage = document.getElementById('team-page');
             const mapView = document.getElementById('map-view');
             const mapContainer = document.getElementById('map-container');
-            const langEnBtn = document.getElementById('lang-en');
-            const langArBtn = document.getElementById('lang-ar');
-            const loggedOutContainer = document.getElementById('auth-container-logged-out');
-            const loggedInContainer = document.getElementById('auth-container-logged-in');
-            const userNameDisplay = document.getElementById('user-name-display');
-            const userMenuBtn = document.getElementById('user-menu-btn');
-            const userMenu = document.getElementById('user-menu');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const menuBtn = document.getElementById('menu-btn');
+            const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+            const loggedOutSidebar = document.getElementById('sidebar-auth-logged-out');
+            const loggedInSidebar = document.getElementById('sidebar-auth-logged-in');
+            const sidebarUserName = document.getElementById('sidebar-user-name');
             const loginModal = document.getElementById('login-modal');
             const signupModal = document.getElementById('signup-modal');
             const passwordChangeModal = document.getElementById('password-change-modal');
@@ -660,16 +591,16 @@
             const editProfileForm = document.getElementById('edit-profile-form');
             const historyList = document.getElementById('history-list');
             const noHistoryMessage = document.getElementById('no-history-message');
-            const themeToggleBtn = document.getElementById('theme-toggle');
-            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-            const readAloudBtn = document.getElementById('read-aloud-btn');
-            const readAloudPlayIcon = document.getElementById('read-aloud-play-icon');
-            const readAloudStopIcon = document.getElementById('read-aloud-stop-icon');
+            const themeToggleSidebar = document.getElementById('theme-toggle-sidebar');
+            const talkbackToggle = document.getElementById('talkback-toggle');
 
             let mapInitialized = false;
             let map = null;
             let speechVoices = [];
+            let isTalkbackEnabled = false;
+            let currentHighlight = null;
+            const allViews = [landingPage, mapView, pageContent];
+            const pageViews = { '#team': teamPage };
 
             // --- TEXT-TO-SPEECH VOICE LOADER ---
             function loadVoices() {
@@ -679,17 +610,37 @@
             if (speechSynthesis.onvoiceschanged !== undefined) {
                 speechSynthesis.onvoiceschanged = loadVoices;
             }
+
+            // --- TEAM SECTION RENDER ---
+            function renderTeam() {
+                const teamContainer = document.querySelector('#team-page .grid');
+                 if(!teamContainer) return;
+                teamContainer.innerHTML = ''; // Clear existing
+                teamMembers.forEach((member, index) => {
+                    const card = document.createElement('div');
+                    card.className = "team-card bg-gray-50 dark:bg-gray-800 p-6 rounded-lg shadow-md text-center animate-on-scroll";
+                    card.style.transitionDelay = `${index * 100}ms`;
+                    card.innerHTML = `
+                        <img src="${member.img}" onerror="this.onerror=null;this.src='https://placehold.co/100x100/E2E8F0/4A5568?text=${member.name.charAt(0)}';" alt="Photo of ${member.name}" class="w-24 h-24 rounded-full mx-auto mb-4 border-2 border-gray-200 dark:border-gray-700 object-cover">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">${member.name}</h3>
+                        <p class="text-blue-600 dark:text-blue-400 font-semibold">${member.role}</p>
+                        <p class="text-gray-600 dark:text-gray-400 mt-2 text-sm">${member.desc}</p>
+                    `;
+                    teamContainer.appendChild(card);
+                });
+            }
+            renderTeam();
+            
             
             // --- THEME/DARK MODE LOGIC ---
             const applyTheme = (theme) => {
+                const icon = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"></svg>`;
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
-                    themeToggleLightIcon.classList.add('hidden');
-                    themeToggleDarkIcon.classList.remove('hidden');
+                    themeToggleSidebar.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 15a5 5 0 100-10 5 5 0 000 10zM10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-7-8a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-2.929-5.071a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zm-9.142 9.142a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707.707zm9.142 0a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707zm-9.142-9.142a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`;
                 } else {
                     document.documentElement.classList.remove('dark');
-                    themeToggleDarkIcon.classList.add('hidden');
-                    themeToggleLightIcon.classList.remove('hidden');
+                    themeToggleSidebar.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>`;
                 }
             };
 
@@ -700,9 +651,8 @@
                 applyTheme(newTheme);
             };
 
-            themeToggleBtn.addEventListener('click', toggleTheme);
+            themeToggleSidebar.addEventListener('click', toggleTheme);
 
-            // Set initial theme on page load
             const initialTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(initialTheme);
             
@@ -719,7 +669,6 @@
                 document.documentElement.lang = lang;
                 document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
                 
-                // Keep dark mode class if it exists
                 const bodyClasses = ['lang-' + lang, 'text-gray-800'];
                 if(document.documentElement.classList.contains('dark')) {
                     bodyClasses.push('dark');
@@ -750,90 +699,77 @@
             };
 
             const updateLangButtons = (lang) => {
+                const langEnBtnSidebar = document.getElementById('lang-en-sidebar');
+                const langArBtnSidebar = document.getElementById('lang-ar-sidebar');
                 if (lang === 'ar') {
-                    langArBtn.classList.add('bg-gray-700', 'text-white');
-                    langArBtn.classList.remove('text-gray-400', 'hover:bg-gray-700');
-                    langEnBtn.classList.remove('bg-gray-700', 'text-white');
-                    langEnBtn.classList.add('text-gray-400', 'hover:bg-gray-700');
+                    langArBtnSidebar.classList.add('bg-blue-600', 'text-white');
+                    langEnBtnSidebar.classList.remove('bg-blue-600', 'text-white');
                 } else {
-                    langEnBtn.classList.add('bg-gray-700', 'text-white');
-                    langEnBtn.classList.remove('text-gray-400', 'hover:bg-gray-700');
-                    langArBtn.classList.remove('bg-gray-700', 'text-white');
-                    langArBtn.classList.add('text-gray-400', 'hover:bg-gray-700');
+                    langEnBtnSidebar.classList.add('bg-blue-600', 'text-white');
+                    langArBtnSidebar.classList.remove('bg-blue-600', 'text-white');
                 }
             };
             
-            langEnBtn.addEventListener('click', () => setLanguage('en'));
-            langArBtn.addEventListener('click', () => setLanguage('ar'));
+            document.getElementById('lang-en-sidebar').addEventListener('click', () => setLanguage('en'));
+            document.getElementById('lang-ar-sidebar').addEventListener('click', () => setLanguage('ar'));
             
             const preferredLanguage = localStorage.getItem('preferredLanguage') || 'en';
             setLanguage(preferredLanguage);
 
+            // --- Scroll Animations ---
+            const scrollElements = document.querySelectorAll('.animate-on-scroll');
+            const elementInView = (el, offset = 0) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return (
+                    elementTop <= 
+                    (window.innerHeight || document.documentElement.clientHeight) - offset
+                );
+            };
+
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if(elementInView(el, 100)) {
+                        el.classList.add('is-visible');
+                    }
+                })
+            }
+            window.addEventListener('scroll', handleScrollAnimation);
+
 
             // --- VIEW MANAGEMENT ---
-            const showLandingPage = () => {
+            function showPage(hash) {
                 speechSynthesis.cancel();
-                landingPage.classList.remove('hidden');
-                mapView.classList.add('hidden');
-                if (window.location.hash === "#map") {
-                    window.location.hash = "";
-                }
-            };
+                allViews.forEach(v => v.classList.add('hidden'));
+                Object.values(pageViews).forEach(v => v.classList.add('hidden'));
 
-            const showMapView = () => {
-                speechSynthesis.cancel();
-                landingPage.classList.add('hidden');
-                mapView.classList.remove('hidden');
-                if (!mapInitialized) {
-                    initializeMapApp();
-                    mapInitialized = true;
+                if (hash === '#map' && auth.currentUser) {
+                    mapView.classList.remove('hidden');
+                    if (!mapInitialized) {
+                        initializeMapApp();
+                        mapInitialized = true;
+                    }
+                    setTimeout(() => { if (map) map.invalidateSize(); }, 0);
+                } else if (pageViews[hash]) {
+                    pageContent.classList.remove('hidden');
+                    pageViews[hash].classList.remove('hidden');
+                } else {
+                    landingPage.classList.remove('hidden');
                 }
-                setTimeout(() => { if (map) map.invalidateSize(); }, 0);
-            };
+                window.scrollTo(0, 0);
+                setTimeout(handleScrollAnimation, 100); // Trigger animations on new page
+            }
             
-             // --- TEXT-TO-SPEECH LOGIC ---
-            const handleReadAloud = () => {
-                if (speechSynthesis.speaking) {
-                    speechSynthesis.cancel();
+             // --- "TALKBACK" TEXT-TO-SPEECH LOGIC ---
+            const speakText = (element) => {
+                if (!isTalkbackEnabled || !element || !element.innerText.trim()) {
                     return;
                 }
 
-                let textToRead = '';
-                const isMapView = !mapView.classList.contains('hidden');
-                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
+                speechSynthesis.cancel(); // Stop any previous speech
 
-                if (isMapView) {
-                    const dataPanel = document.getElementById('data-panel');
-                    const dataContent = document.getElementById('data-content');
-                    if (dataPanel && !dataPanel.classList.contains('hidden') && dataContent && !dataContent.classList.contains('hidden')) {
-                        const city = document.getElementById('city-name').innerText;
-                        const aqiLabel = translations[currentLang].dataPanelAQI;
-                        const aqiValue = document.getElementById('aqi-value').innerText;
-                        const aqiStatus = document.getElementById('aqi-status').innerText;
-                        
-                        const weatherDescription = document.getElementById('weather-description').innerText;
-
-                        const tempLabel = translations[currentLang].dataPanelTemp;
-                        const tempValue = document.getElementById('temp-value').innerText;
-                        const humidityLabel = translations[currentLang].dataPanelHumidity;
-                        const humidityValue = document.getElementById('humidity-value').innerText;
-                        const windLabel = translations[currentLang].dataPanelWind;
-                        const windValue = document.getElementById('wind-value').innerText;
-
-                        const adviceLabel = translations[currentLang].dataPanelHealthAdvice;
-                        const advice = document.getElementById('forecast-text').innerText;
-                        
-                        textToRead = `${city}. ${aqiLabel}: ${aqiValue}, ${aqiStatus}. ${weatherDescription}. ${tempLabel}: ${tempValue}. ${humidityLabel}: ${humidityValue}. ${windLabel}: ${windValue}. ${adviceLabel}: ${advice}`;
-                    } else {
-                        textToRead = currentLang === 'ar' ? 'الرجاء تحديد موقع على الخريطة أولاً.' : 'Please select a location on the map first.';
-                    }
-                } else {
-                    textToRead = landingPage.innerText.replace(/\s\s+/g, ' ').trim();
-                }
-
-                if (!textToRead.trim()) { return; }
-
+                const textToRead = element.innerText;
                 const utterance = new SpeechSynthesisUtterance(textToRead);
+                const currentLang = localStorage.getItem('preferredLanguage') || 'en';
                 const langCode = currentLang === 'ar' ? 'ar-SA' : 'en-US';
                 const langShortCode = currentLang === 'ar' ? 'ar' : 'en';
 
@@ -846,43 +782,62 @@
                     utterance.voice = selectedVoice;
                 } else {
                     utterance.lang = langCode;
-                    console.warn(`TTS voice for '${langCode}' not found. Falling back to browser default.`);
                 }
-                
-                utterance.onstart = () => {
-                    readAloudPlayIcon.classList.add('hidden');
-                    readAloudStopIcon.classList.remove('hidden');
-                };
-                utterance.onend = () => {
-                    readAloudPlayIcon.classList.remove('hidden');
-                    readAloudStopIcon.classList.add('hidden');
-                };
-                utterance.onerror = (event) => {
-                    console.error('SpeechSynthesisUtterance.onerror', event);
-                    readAloudPlayIcon.classList.remove('hidden');
-                    readAloudStopIcon.classList.add('hidden');
-                };
                 
                 speechSynthesis.speak(utterance);
             };
-            readAloudBtn.addEventListener('click', handleReadAloud);
+
+            const handleMouseOver = (event) => {
+                if (!isTalkbackEnabled) return;
+                
+                const target = event.target.closest('h1, h2, h3, h4, p, a, button, [data-readable]');
+                if (target && target !== currentHighlight) {
+                     if (currentHighlight) {
+                        currentHighlight.classList.remove('talkback-highlight');
+                    }
+                    currentHighlight = target;
+                    currentHighlight.classList.add('talkback-highlight');
+                    speakText(target);
+                }
+            };
+
+            const handleMouseOut = (event) => {
+                if (currentHighlight) {
+                    currentHighlight.classList.remove('talkback-highlight');
+                    currentHighlight = null;
+                    speechSynthesis.cancel();
+                }
+            };
+
+            talkbackToggle.addEventListener('change', () => {
+                isTalkbackEnabled = talkbackToggle.checked;
+                if(isTalkbackEnabled) {
+                    document.body.addEventListener('mouseover', handleMouseOver);
+                    document.body.addEventListener('mouseout', handleMouseOut);
+                } else {
+                    document.body.removeEventListener('mouseover', handleMouseOver);
+                    document.body.removeEventListener('mouseout', handleMouseOut);
+                    speechSynthesis.cancel();
+                     if (currentHighlight) {
+                        currentHighlight.classList.remove('talkback-highlight');
+                        currentHighlight = null;
+                    }
+                }
+            });
 
 
             // --- AUTHENTICATION STATE OBSERVER ---
             onAuthStateChanged(auth, user => {
                 if (user) {
-                    loggedOutContainer.classList.add('hidden');
-                    loggedInContainer.classList.remove('hidden');
-                    userNameDisplay.textContent = user.displayName || user.email;
-                    if(window.location.hash === '#map' && !mapInitialized) {
-                       showMapView();
-                    }
+                    loggedInSidebar.classList.remove('hidden');
+                    loggedOutSidebar.classList.add('hidden');
+                    sidebarUserName.textContent = user.displayName || user.email;
                 } else {
-                    loggedOutContainer.classList.remove('hidden');
-                    loggedInContainer.classList.add('hidden');
-                    userNameDisplay.textContent = '';
-                    showLandingPage();
+                    loggedOutSidebar.classList.remove('hidden');
+                    loggedInSidebar.classList.add('hidden');
+                    sidebarUserName.textContent = '';
                 }
+                showPage(window.location.hash);
             });
             
             document.getElementById('launch-map-btn').addEventListener('click', (e) => {
@@ -895,47 +850,39 @@
             });
             document.getElementById('home-logo-link').addEventListener('click', (e) => {
                 e.preventDefault();
-                showLandingPage();
+                window.location.hash = '';
             });
             
-            window.addEventListener('hashchange', () => {
-                 if(window.location.hash === '#map' && auth.currentUser) {
-                    showMapView();
-                 } else {
-                    showLandingPage();
-                 }
-            });
+            window.addEventListener('hashchange', () => showPage(window.location.hash));
+            showPage(window.location.hash); // Initial load
 
 
             // --- MODAL AND FORM HANDLING ---
-            document.getElementById('login-btn').addEventListener('click', () => loginModal.classList.remove('hidden'));
-            document.getElementById('signup-btn').addEventListener('click', () => signupModal.classList.remove('hidden'));
-            document.getElementById('change-password-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                userMenu.classList.add('hidden');
-                passwordChangeModal.classList.remove('hidden');
-            });
-             document.getElementById('forgot-password-link').addEventListener('click', (e) => {
-                e.preventDefault();
-                loginModal.classList.add('hidden');
-                forgotPasswordModal.classList.remove('hidden');
-            });
-            document.getElementById('edit-profile-btn').addEventListener('click', (e) => {
+            document.getElementById('login-btn-sidebar').addEventListener('click', () => { closeSidebar(); loginModal.classList.remove('hidden'); });
+            document.getElementById('signup-btn-sidebar').addEventListener('click', () => { closeSidebar(); signupModal.classList.remove('hidden'); });
+            document.getElementById('change-password-btn-sidebar').addEventListener('click', (e) => { e.preventDefault(); closeSidebar(); passwordChangeModal.classList.remove('hidden'); });
+            document.getElementById('edit-profile-btn-sidebar').addEventListener('click', (e) => { 
                 e.preventDefault();
                 const user = auth.currentUser;
                 if (user) {
                     document.getElementById('edit-name').value = user.displayName || '';
                     document.getElementById('edit-email').value = user.email || '';
                 }
-                userMenu.classList.add('hidden');
-                editProfileModal.classList.remove('hidden');
+                closeSidebar();
+                editProfileModal.classList.remove('hidden'); 
             });
-            document.getElementById('history-btn').addEventListener('click', (e) => {
+            document.getElementById('history-btn-sidebar').addEventListener('click', (e) => { 
                 e.preventDefault();
-                userMenu.classList.add('hidden');
+                closeSidebar();
                 displaySearchHistory();
-                historyModal.classList.remove('hidden');
+                historyModal.classList.remove('hidden'); 
             });
+            document.getElementById('logout-btn-sidebar').addEventListener('click', (e) => {
+                e.preventDefault();
+                signOut(auth);
+                closeSidebar();
+            });
+
             
             const closeAllModals = () => {
                 document.querySelectorAll('#auth-modals > div').forEach(modal => modal.classList.add('hidden'));
@@ -953,12 +900,15 @@
             document.getElementById('show-signup').addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.add('hidden'); signupModal.classList.remove('hidden'); });
             document.getElementById('show-login').addEventListener('click', (e) => { e.preventDefault(); signupModal.classList.add('hidden'); loginModal.classList.remove('hidden'); });
 
-            userMenuBtn.addEventListener('click', () => userMenu.classList.toggle('hidden'));
-            document.addEventListener('click', (e) => {
-                if (!loggedInContainer.contains(e.target)) {
-                    userMenu.classList.add('hidden');
-                }
+             // Sidebar Toggle
+            const closeSidebar = () => document.body.classList.remove('sidebar-open');
+            menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', closeSidebar);
             });
+
 
             // --- FIREBASE AUTH ACTIONS ---
             signupForm.addEventListener('submit', (e) => {
@@ -991,11 +941,6 @@
                 signInWithEmailAndPassword(auth, email, password)
                     .then(() => { closeAllModals(); loginForm.reset(); })
                     .catch(error => { document.getElementById('login-error').textContent = error.message; });
-            });
-            
-            document.getElementById('logout-btn').addEventListener('click', (e) => {
-                e.preventDefault();
-                signOut(auth);
             });
 
             passwordChangeForm.addEventListener('submit', (e) => {
@@ -1157,74 +1102,6 @@
                     historyList.innerHTML = `<p class="text-red-500 text-center">Could not load history.</p>`;
                 }
             };
-            
-            // --- 3D GLOBE INITIALIZATION ---
-            function initializeGlobe() {
-                const container = document.getElementById('globe-container');
-                if (!container) return;
-
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-                camera.position.z = 2.5;
-
-                const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-                renderer.setSize(container.clientWidth, container.clientHeight);
-                renderer.setPixelRatio(window.devicePixelRatio);
-                container.appendChild(renderer.domElement);
-
-                scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-                directionalLight.position.set(5, 3, 5);
-                scene.add(directionalLight);
-
-                const earthGeometry = new THREE.SphereGeometry(1.2, 64, 64);
-                const textureLoader = new THREE.TextureLoader();
-                const earthMaterial = new THREE.MeshPhongMaterial({
-                    color: 0x2266aa, // Fallback color
-                    shininess: 30
-                });
-
-                const earthTextureUrl = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/land_ocean_ice_cloud_2048.jpg';
-                textureLoader.load(earthTextureUrl, 
-                    (texture) => {
-                        earthMaterial.map = texture;
-                        earthMaterial.needsUpdate = true;
-                    }, 
-                    undefined, 
-                    (error) => {
-                        console.error('An error happened while loading the Earth texture.', error);
-                    }
-                );
-
-                const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
-                scene.add(earthMesh);
-
-                const controls = new OrbitControls(camera, renderer.domElement);
-                controls.enableDamping = true;
-                controls.enablePan = false;
-                controls.minDistance = 2;
-                controls.maxDistance = 5;
-
-                function animate() {
-                    requestAnimationFrame(animate);
-                    earthMesh.rotation.y += 0.0005;
-                    controls.update();
-                    renderer.render(scene, camera);
-                }
-                animate();
-
-                window.addEventListener('resize', () => {
-                    if (container.clientWidth > 0 && container.clientHeight > 0) {
-                        camera.aspect = container.clientWidth / container.clientHeight;
-                        camera.updateProjectionMatrix();
-                        renderer.setSize(container.clientWidth, container.clientHeight);
-                    }
-                });
-            }
-
-            // Call globe initialization
-            initializeGlobe();
-
 
             // --- MAP APPLICATION LOGIC (INITIALIZED ON DEMAND) ---
             function initializeMapApp() {
@@ -1240,7 +1117,7 @@
                     <button id="locate-btn" class="absolute bottom-4 left-4 z-[1000] bg-white p-3 rounded-full shadow-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500" title="Find my location">
                         <svg id="locate-icon" xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 0 24 24" fill="currentColor" class="text-gray-600"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3c-.46-4.17-3.77-7.48-7.94-7.94V1h-2v2.06C6.83 3.52 3.52 6.83 3.06 11H1v2h2.06c.46 4.17 3.77 7.48 7.94 7.94V23h2v-2.06c4.17-.46 7.48-3.77 7.94-7.94H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
                     </button>
-                    <div id="data-panel" class="absolute top-[140px] sm:top-24 left-2 right-2 sm:left-auto sm:right-4 sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden">
+                    <div id="data-panel" class="absolute top-[100px] sm:top-24 left-2 right-2 sm:left-auto sm:right-4 sm:w-80 z-[1000] bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg hidden" data-readable="true">
                         <div id="loading" class="flex justify-center items-center h-48"><div class="loader"></div></div>
                         <div id="data-content" class="hidden">
                             <button id="close-panel-btn" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 z-10 p-1 rounded-full hover:bg-gray-100"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg></button>
