@@ -296,14 +296,6 @@
             outline: none;
         }
         
-        /* --- Loader --- */
-        .loader { 
-            border: 5px solid rgba(79, 70, 229, 0.2); 
-            border-top: 5px solid var(--color-accent); 
-            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; 
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
         /* --- Sidebar Styles --- */
         #sidebar { transition: transform 0.3s ease-in-out; }
         #sidebar-overlay { transition: opacity 0.3s ease-in-out; }
@@ -419,6 +411,326 @@
         html.light .text-green-400 { color: #22c55e; }
         html.light .text-indigo-400 { color: #6366f1; }
         html.light .text-indigo-300 { color: #818cf8; }
+
+        /* --- Theme Switch CSS --- */
+        .switch {
+          font-size: 17px;
+          position: relative;
+          display: inline-block;
+          width: 3.5em;
+          height: 2em;
+        }
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+        .slider {
+          --background: #28096b;
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: var(--background);
+          transition: .5s;
+          border-radius: 30px;
+        }
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 1.4em;
+          width: 1.4em;
+          border-radius: 50%;
+          left: 10%;
+          bottom: 15%;
+          box-shadow: inset 8px -4px 0px 0px #fff000;
+          background: var(--background);
+          transition: .5s;
+        }
+        input:checked + .slider {
+          background-color: #522ba7;
+        }
+        input:checked + .slider:before {
+          transform: translateX(100%);
+          box-shadow: inset 15px -4px 0px 15px #fff000;
+        }
+
+        /* --- AI Assistant Button CSS --- */
+        .button {
+          --h-button: 48px;
+          --w-button: 102px;
+          --round: 0.75rem;
+          cursor: pointer;
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          transition: all 0.25s ease;
+          background: radial-gradient(
+              65.28% 65.28% at 50% 100%,
+              rgba(223, 113, 255, 0.8) 0%,
+              rgba(223, 113, 255, 0) 100%
+            ),
+            linear-gradient(0deg, #7a5af8, #7a5af8);
+          border-radius: var(--round);
+          border: none;
+          outline: none;
+          padding: 12px 18px;
+        }
+        .button::before,
+        .button::after {
+          content: "";
+          position: absolute;
+          inset: var(--space);
+          transition: all 0.5s ease-in-out;
+          border-radius: calc(var(--round) - var(--space));
+          z-index: 0;
+        }
+        .button::before {
+          --space: 1px;
+          background: linear-gradient(
+            177.95deg,
+            rgba(255, 255, 255, 0.19) 0%,
+            rgba(255, 255, 255, 0) 100%
+          );
+        }
+        .button::after {
+          --space: 2px;
+          background: radial-gradient(
+              65.28% 65.28% at 50% 100%,
+              rgba(223, 113, 255, 0.8) 0%,
+              rgba(223, 113, 255, 0) 100%
+            ),
+            linear-gradient(0deg, #7a5af8, #7a5af8);
+        }
+        .button:active {
+          transform: scale(0.95);
+        }
+
+        .fold {
+          z-index: 1;
+          position: absolute;
+          top: 0;
+          right: 0;
+          height: 1rem;
+          width: 1rem;
+          display: inline-block;
+          transition: all 0.5s ease-in-out;
+          background: radial-gradient(
+            100% 75% at 55%,
+            rgba(223, 113, 255, 0.8) 0%,
+            rgba(223, 113, 255, 0) 100%
+          );
+          box-shadow: 0 0 3px black;
+          border-bottom-left-radius: 0.5rem;
+          border-top-right-radius: var(--round);
+        }
+        .fold::after {
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 150%;
+          height: 150%;
+          transform: rotate(45deg) translateX(0%) translateY(-18px);
+          background-color: #e8e8e8;
+          pointer-events: none;
+        }
+        .button:hover .fold {
+          margin-top: -1rem;
+          margin-right: -1rem;
+        }
+
+        .points_wrapper {
+          overflow: hidden;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          position: absolute;
+          z-index: 1;
+        }
+
+        .points_wrapper .point {
+          bottom: -10px;
+          position: absolute;
+          animation: floating-points infinite ease-in-out;
+          pointer-events: none;
+          width: 2px;
+          height: 2px;
+          background-color: #fff;
+          border-radius: 9999px;
+        }
+        @keyframes floating-points {
+          0% {
+            transform: translateY(0);
+          }
+          85% {
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(-55px);
+            opacity: 0;
+          }
+        }
+        .points_wrapper .point:nth-child(1) {
+          left: 10%;
+          opacity: 1;
+          animation-duration: 2.35s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(2) {
+          left: 30%;
+          opacity: 0.7;
+          animation-duration: 2.5s;
+          animation-delay: 0.5s;
+        }
+        .points_wrapper .point:nth-child(3) {
+          left: 25%;
+          opacity: 0.8;
+          animation-duration: 2.2s;
+          animation-delay: 0.1s;
+        }
+        .points_wrapper .point:nth-child(4) {
+          left: 44%;
+          opacity: 0.6;
+          animation-duration: 2.05s;
+        }
+        .points_wrapper .point:nth-child(5) {
+          left: 50%;
+          opacity: 1;
+          animation-duration: 1.9s;
+        }
+        .points_wrapper .point:nth-child(6) {
+          left: 75%;
+          opacity: 0.5;
+          animation-duration: 1.5s;
+          animation-delay: 1.5s;
+        }
+        .points_wrapper .point:nth-child(7) {
+          left: 88%;
+          opacity: 0.9;
+          animation-duration: 2.2s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(8) {
+          left: 58%;
+          opacity: 0.8;
+          animation-duration: 2.25s;
+          animation-delay: 0.2s;
+        }
+        .points_wrapper .point:nth-child(9) {
+          left: 98%;
+          opacity: 0.6;
+          animation-duration: 2.6s;
+          animation-delay: 0.1s;
+        }
+        .points_wrapper .point:nth-child(10) {
+          left: 65%;
+          opacity: 1;
+          animation-duration: 2.5s;
+          animation-delay: 0.2s;
+        }
+
+        .inner {
+          z-index: 2;
+          gap: 6px;
+          position: relative;
+          width: 100%;
+          color: white;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.5;
+          transition: color 0.2s ease-in-out;
+        }
+
+        .inner svg.icon {
+          width: 18px;
+          height: 18px;
+          transition: fill 0.1s linear;
+        }
+
+        .button:focus svg.icon {
+          fill: white;
+        }
+        .button:hover svg.icon {
+          fill: transparent;
+          animation:
+            dasharray 1s linear forwards,
+            filled 0.1s linear forwards 0.95s;
+        }
+        @keyframes dasharray {
+          from {
+            stroke-dasharray: 0 0 0 0;
+          }
+          to {
+            stroke-dasharray: 68 68 0 0;
+          }
+        }
+        @keyframes filled {
+          to {
+            fill: white;
+          }
+        }
+
+        /* --- New Loading Indicator CSS --- */
+        .loading {
+         --speed-of-animation: 0.9s;
+         --gap: 6px;
+         --first-color: #4c86f9;
+         --second-color: #49a84c;
+         --third-color: #f6bb02;
+         --fourth-color: #f6bb02;
+         --fifth-color: #2196f3;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         width: 100px;
+         gap: 6px;
+         height: 100px;
+        }
+
+        .loading span {
+         width: 4px;
+         height: 50px;
+         background: var(--first-color);
+         animation: scale var(--speed-of-animation) ease-in-out infinite;
+        }
+
+        .loading span:nth-child(2) {
+         background: var(--second-color);
+         animation-delay: -0.8s;
+        }
+
+        .loading span:nth-child(3) {
+         background: var(--third-color);
+         animation-delay: -0.7s;
+        }
+
+        .loading span:nth-child(4) {
+         background: var(--fourth-color);
+         animation-delay: -0.6s;
+        }
+
+        .loading span:nth-child(5) {
+         background: var(--fifth-color);
+         animation-delay: -0.5s;
+        }
+
+        @keyframes scale {
+         0%, 40%, 100% {
+          transform: scaleY(0.05);
+         }
+
+         20% {
+          transform: scaleY(1);
+         }
+        }
     </style>
 </head>
 <body class="text-gray-200">
@@ -448,7 +760,10 @@
                 </div>
                  <div class="flex items-center justify-between">
                     <span class="text-gray-300" data-lang-key="navTheme">Theme</span>
-                    <button id="theme-toggle-sidebar" class="p-2 rounded-lg text-gray-400 hover:bg-gray-700"></button>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-switch-input">
+                        <span class="slider"></span>
+                    </label>
                 </div>
                 <div class="flex items-center justify-between">
                     <label for="talkback-toggle" class="text-gray-300" data-lang-key="navTalkback">Read on Hover</label>
@@ -607,8 +922,37 @@
     </footer>
 
     <!-- AI Assistant Button and Modal -->
-    <button id="ai-assistant-btn" class="fixed bottom-6 right-6 z-[1500] w-16 h-16 rounded-full glow-button flex items-center justify-center shadow-lg">
-        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 12m-6 0a6 6 0 1 0 12 0a6 6 0 1 0 -12 0" fill="#4f46e5" fill-opacity="0.3" /><path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c.34 0 .67-.03 1-.09-.36-.6-.58-1.29-.58-2.04 0-2.21 1.79-4 4-4 .75 0 1.44.22 2.04.58-.06-.33-.09-.66-.09-1 0-3.31-2.69-6-6-6zm-1.5 6.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+    <button type="button" id="ai-assistant-btn" class="button fixed bottom-6 right-6 z-[1500]">
+        <span class="fold"></span>
+        <div class="points_wrapper">
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+            <i class="point"></i>
+        </div>
+        <span class="inner">
+            <svg
+                class="icon"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+            >
+                <polyline
+                points="13.18 1.37 13.18 9.64 21.45 9.64 10.82 22.63 10.82 14.36 2.55 14.36 13.18 1.37"
+                ></polyline>
+            </svg>
+            AI
+        </span>
     </button>
 
     <div id="ai-modal" class="fixed inset-0 bg-black bg-opacity-75 z-[2000] flex justify-center items-center hidden">
@@ -618,8 +962,14 @@
             <div id="ai-chat-window" class="flex-grow bg-gray-900/50 rounded-lg p-4 overflow-y-auto mb-4">
                 <!-- Chat messages will be injected here -->
             </div>
-            <div id="ai-loading-indicator" class="hidden text-center mb-2">
-                <p class="text-sm text-gray-400" data-lang-key="aiTyping">AI is typing...</p>
+            <div id="ai-loading-indicator" class="hidden flex justify-center items-center mb-2 h-12">
+                <div class="loading" style="height: 50px;">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
             </div>
             <div id="ai-context-actions" class="flex justify-center space-x-2 mb-2">
                 <button id="get-forecast-btn" class="text-sm bg-indigo-800 hover:bg-indigo-700 text-white py-1 px-3 rounded-full hidden" data-lang-key="getForecast">Get Forecast</button>
@@ -901,7 +1251,7 @@
             const sidebarOverlay = document.getElementById('sidebar-overlay');
             const menuBtn = document.getElementById('menu-btn');
             const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-            const themeToggleSidebar = document.getElementById('theme-toggle-sidebar');
+            const themeSwitch = document.getElementById('theme-switch-input');
             const talkbackToggle = document.getElementById('talkback-toggle');
 
             // AI Assistant UI Elements
@@ -1119,22 +1469,22 @@
             const applyTheme = (theme) => {
                 if (theme === 'light') {
                     document.documentElement.classList.add('light');
-                    themeToggleSidebar.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>`; // Moon icon
+                    themeSwitch.checked = true;
                 } else { // 'dark' is default
                     document.documentElement.classList.remove('light');
-                    themeToggleSidebar.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 15a5 5 0 100-10 5 5 0 000 10zM10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm0 14a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm-7-8a1 1 0 011-1h1a1 1 0 110 2H4a1 1 0 01-1-1zm14 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-2.929-5.071a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707zm-9.142 9.142a1 1 0 011.414 1.414l-.707.707a1 1 0 01-1.414-1.414l.707.707zm9.142 0a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707zm-9.142-9.142a1 1 0 01-1.414 1.414l.707.707a1 1 0 011.414-1.414l-.707-.707z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>`; // Sun icon
+                    themeSwitch.checked = false;
                 }
             };
 
             const toggleTheme = () => {
-                const currentTheme = localStorage.getItem('theme') || 'dark';
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                const newTheme = themeSwitch.checked ? 'light' : 'dark';
                 localStorage.setItem('theme', newTheme);
                 applyTheme(newTheme);
             };
 
-            themeToggleSidebar.addEventListener('click', toggleTheme);
+            themeSwitch.addEventListener('change', toggleTheme);
 
+            // Set initial theme based on localStorage
             const initialTheme = localStorage.getItem('theme') || 'dark';
             applyTheme(initialTheme);
             
